@@ -74,11 +74,11 @@ public class PeerManager {
     public static Map<Integer, Long> peerDownloadTime = Collections.synchronizedMap(new HashMap<Integer, Long>());
     
     
-    public boolean isOptimisticallyUnchokedPeer(){
+    public boolean isOptUnchokedPeer(){
         return  optimisticallyUnchokedPeer;
     }
 
-    public void setOptimisticallyUnchokedPeer(boolean value){
+    public void setOptUnchokedPeer(boolean value){
         optimisticallyUnchokedPeer = value;
     }
     
