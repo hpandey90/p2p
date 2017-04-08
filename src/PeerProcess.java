@@ -10,7 +10,7 @@ import java.util.logging.Logger;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 //testing
-public class PeerProcess {
+public class peerProcess {
     
 	private static final Logger LOGGER = MyLogger.getMyLogger();
 
@@ -54,8 +54,8 @@ public class PeerProcess {
         // Obtain the listening port for the owner peerId
         String portNo = string.split(" ")[2];
         
-        // Create a PeerProcess object to start client peers and owner server peer connection communication processes 
-        PeerProcess peerProcessOb = new PeerProcess();
+        // Create a peerProcess object to start client peers and owner server peer connection communication processes 
+        peerProcess peerProcessOb = new peerProcess();
         
         // Connect the owner peer to all the available client peers in the peerInfo file with id < owner peerId
         peerProcessOb.clientConnect(peerId);
@@ -64,8 +64,8 @@ public class PeerProcess {
         // in a seperate thread each on its port number. 
         peerProcessOb.acceptConnection(peerId, Integer.valueOf(portNo));
         
-        // Create another PeerProcess object to determinePreferredNeighbours,determineOptimisticallyUnchokedNeighbour & determineShutdownScheduler   
-        PeerProcess peerProcessObj = new PeerProcess();
+        // Create another peerProcess object to determinePreferredNeighbours,determineOptimisticallyUnchokedNeighbour & determineShutdownScheduler   
+        peerProcess peerProcessObj = new peerProcess();
         Map<String, String> comProp = CommonPeerConfig.retrieveCommonConfig();
         
         // Retrieve the property values from the common config file
@@ -245,7 +245,7 @@ public class PeerProcess {
                         		// if <k preferred neighbbours have been determined
                         		if (count > 0) {
                                 
-                        			System.out.println("PeerProcess.run unchoked " + next.getPeerId());
+                        			System.out.println("peerProcess.run unchoked " + next.getPeerId());
                                     
                         			// Add the peer to the unchoke list of the owner peer
                         			unchokeList.add(next);
@@ -281,7 +281,7 @@ public class PeerProcess {
                         		// if k preferred neighbours have already been selected
                         		else {
                                     
-                                	System.out.println("PeerProcess.run choked " + next.getPeerId());
+                                	System.out.println("peerProcess.run choked " + next.getPeerId());
                                     // add the selected interested peer to the chokeList of owner peer
                                 	chokeList.add(next);
                                     

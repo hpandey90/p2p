@@ -306,7 +306,7 @@ public class PeerManager {
     	synchronized (handshakeSucess) {
             
     		// Create the handshake message by concatenating the handshake header, zero bits and the owner peerId 
-    		// (retrieved from the commonConfig hashmap written in PeerProcess).
+    		// (retrieved from the commonConfig hashmap written in peerProcess).
             byte[] concatenateByteArrays = ByteArrayManipulation.mergeByteArrays(ByteArrayManipulation.mergeByteArrays(MessageTypes.HANDSHAKE_BYTE_ARR, MessageTypes.ZERO_BITS),
             		CommonPeerConfig.retrieveCommonConfig().get("peerId").getBytes());
             

@@ -10,7 +10,7 @@ public class PeerThread extends Thread {
    
     // Declare the logger
     private static final Logger LOGGER = MyLogger.getMyLogger();
-    
+   
     // Declare the peerSocket
     private Socket peerSocket = null;
     
@@ -70,7 +70,7 @@ public class PeerThread extends Thread {
             peerConnected.setPeerId(pid);
             peerConnected.setClientValue(true);
             
-            // Send handshake message from the owner peer (retrieved from the commonConfig file written in PeerProcess)
+            // Send handshake message from the owner peer (retrieved from the commonConfig file written in peerProcess)
             // to the client peer. 
             peerConnected.sndHandshakeMessage();
             
@@ -343,7 +343,7 @@ public class PeerThread extends Thread {
                         int pos = pieceI % 8;
                         PeerManager.setOwnerBitFieldIndex(index, pos);
                         
-                        for (PeerThread peerThread : PeerProcess.peersList) {
+                        for (PeerThread peerThread : peerProcess.peersList) {
                             
                             System.out.println("Reached Inside Piece Have check ");
                             peerThread.retrievePeerConnected().sendHaveMessage(pieceI);
