@@ -94,9 +94,10 @@ public class peerProcess {
     	Map<Integer, String> peerInfo = CommonPeerConfig.retrievePeerInfo();
 
     	// Iterate by selecting all the peers with peerId < owner peerId
-        for (Integer s : peerInfo.keySet()) {
-
-        	if (s < ownerPeerId) {
+    	for (Map.Entry<Integer, String> s : peerInfo.entrySet()) {
+    	//for (Integer s : peerInfo.keySet()) {
+    		if (s.getKey() < ownerPeerId) {
+        	//if (s < ownerPeerId) {
 
         		// for every selected peer, obtain the client peerId, host and listening port from the peerProp map
         		String line = peerInfo.get(s);
@@ -145,9 +146,10 @@ public class peerProcess {
     	Map<Integer, String> peerInfo = CommonPeerConfig.retrievePeerInfo();
 
     	// Count peers having id > owner peer id
-    	for (Integer s : peerInfo.keySet()) {
-
-    		if (s > ownerPeerId) {
+    	for (Map.Entry<Integer, String> s : peerInfo.entrySet()) {
+    	//for (Integer s : peerInfo.keySet()) {
+    		if (s.getKey() > ownerPeerId) {
+    		//if (s > ownerPeerId) {
                 peerIdGreaterCount++;
             }
         }
