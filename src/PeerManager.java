@@ -78,7 +78,7 @@ public class PeerManager {
         return  optimisticallyUnchokedPeer;
     }
 
-    public void setOptimisticallyUnchokedPeer(boolean value){
+    public void setOptUnchokedPeer(boolean value){
         optimisticallyUnchokedPeer = value;
     }
     
