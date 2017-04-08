@@ -15,13 +15,13 @@ public class peerProcess {
 	private static final Logger LOGGER = MyLogger.getMyLogger();
 
     // Synchronized list to maintain all the connected client peers of owner peer
-	public static List<PeerThread> peersList = Collections.synchronizedList(new ArrayList<PeerThread>());
+	public static List<PeerThread> listOfPeers = Collections.synchronizedList(new ArrayList<PeerThread>());
 
     // List to maintain interested and unchoked peers
-    List<PeerManager> unchokeList = null;
+    List<PeerManager> listOfUnchokedPeers = null;
 
     // List to maintain interested and choked peers
-    List<PeerManager> chokeList = null;
+    List<PeerManager> listOfchokedPeers = null;
 
     // Obtain a ScheduledExecutorSevice object from a scheduledThreadPool for determining preferredNeighbours & optimisticallyUnchokedNeighbour
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(3);
@@ -118,7 +118,7 @@ public class peerProcess {
                     peerThread.start();
 
                     // Add the peerThread to the synchronized peersList of the owner peer
-                    peersList.add(peerThread);
+                    listOfPeers.add(peerThread);
 
                 } catch (NumberFormatException | IOException e) {
 
@@ -175,7 +175,7 @@ public class peerProcess {
                         	peerThread.start();
 
                         	// Add the peerThread created to the peersList
-                            peersList.add(peerThread);
+                            listOfPeers.add(peerThread);
 
                             // Decrement the greaterPeerCount
                             greaterPeerCount--;
@@ -227,8 +227,8 @@ public class peerProcess {
                     	Iterator<PeerManager> iterator = interestedList.iterator();
 
                     	// Instantiate unchoke and choke peers synchronized lists
-                    	unchokeList = Collections.synchronizedList(new ArrayList<PeerManager>());
-                        chokeList = Collections.synchronizedList(new ArrayList<PeerManager>());
+                    	listOfUnchokedPeers = Collections.synchronizedList(new ArrayList<PeerManager>());
+                        listOfchokedPeers = Collections.synchronizedList(new ArrayList<PeerManager>());
 
                     	int count = k;
 
@@ -248,7 +248,7 @@ public class peerProcess {
                         			System.out.println("peerProcess.run unchoked " + next.getPeerId());
 
                         			// Add the peer to the unchoke list of the owner peer
-                        			unchokeList.add(next);
+                        			listOfUnchokedPeers.add(next);
 
                         			// if the selected interested peer is choked previously
                                     if (next.isChoked()) {
@@ -283,7 +283,7 @@ public class peerProcess {
 
                                 	System.out.println("peerProcess.run choked " + next.getPeerId());
                                     // add the selected interested peer to the chokeList of owner peer
-                                	chokeList.add(next);
+                                	listOfchokedPeers.add(next);
 
                                 	// if the selected interested peer is not previously choked
                                     if (!next.isChoked()) {
@@ -354,7 +354,7 @@ public class peerProcess {
             	System.out.println("inside optimistically unchoked neighbour!!");
 
             	// Obtain the size of chokeList of owner peer
-                int size = chokeList.size();
+                int size = listOfchokedPeers.size();
                 System.out.println("size = " + size);
 
                 if (size != 0) {
@@ -363,7 +363,7 @@ public class peerProcess {
                     int randIndex = ThreadLocalRandom.current().nextInt(0, size);
 
                     // Randomly select a peer from the choked peers list of owner peer optimistically
-                    PeerManager PeerManager = chokeList.remove(randIndex);
+                    PeerManager PeerManager = listOfchokedPeers.remove(randIndex);
 
                     System.out.println("selecting an optimistcally neighbor");
                     System.out.println("randIndex = " + randIndex);
@@ -473,13 +473,13 @@ public class peerProcess {
                 System.out.println("Arrays.toString(myBitField) = " + Arrays.toString(myBitField));
 
                 // if peersList size of owner peer equals the total number of peers in peerInfo config file
-                if (peersList.size() == CommonPeerConfig.retrievePeerInfo().size()) {
+                if (listOfPeers.size() == CommonPeerConfig.retrievePeerInfo().size()) {
 
                 	// set the shut down flag to true
                 	boolean shutDown = true;
 
                     // for every peerThread in the peersList
-                	for (PeerThread p : peersList) {
+                	for (PeerThread p : listOfPeers) {
 
                 		// Obtain the bitField message of each peer
                 		byte[] pBitFieldMsg = p.retrievePeerConnected().getbitFieldMessageOfPeer();
@@ -497,7 +497,7 @@ public class peerProcess {
                     if (shutDown) {
 
                     	// for every peerThread in the peersList
-                    	for (PeerThread p : peersList) {
+                    	for (PeerThread p : listOfPeers) {
 
                     		// set the stop flag for peer to be true
                     		p.setToStop(true);
