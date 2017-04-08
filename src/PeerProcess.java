@@ -10,7 +10,7 @@ import java.util.logging.Logger;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 //testing
-public class PeerProcess {
+public class peerProcess {
 
 	private static final Logger LOGGER = MyLogger.getMyLogger();
 
@@ -55,7 +55,7 @@ public class PeerProcess {
         String portNo = string.split(" ")[2];
 
         // Create a peerProcess object to start client peers and owner server peer connection communication processes
-        PeerProcess peerProcessOb = new PeerProcess();
+        peerProcess peerProcessOb = new peerProcess();
 
         // Connect the owner peer to all the available client peers in the peerInfo file with id < owner peerId
         peerProcessOb.clientConnect(peerId);
@@ -65,7 +65,7 @@ public class PeerProcess {
         peerProcessOb.acceptConnection(peerId, Integer.valueOf(portNo));
 
         // Create another peerProcess object to determinePreferredNeighbours,determineOptimisticallyUnchokedNeighbour & determineShutdownScheduler
-        PeerProcess peerProcessObj = new PeerProcess();
+        peerProcess peerProcessObj = new peerProcess();
         Map<String, String> comProp = CommonPeerConfig.retrieveCommonConfig();
 
         // Retrieve the property values from the common config file

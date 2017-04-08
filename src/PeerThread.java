@@ -343,7 +343,7 @@ public class PeerThread extends Thread {
                         int pos = pieceI % 8;
                         PeerManager.setOwnerBitFieldIndex(index, pos);
                         
-                        for (PeerThread peerThread : PeerProcess.peersList) {
+                        for (PeerThread peerThread : peerProcess.peersList) {
                             
                             System.out.println("Reached Inside Piece Have check ");
                             peerThread.retrievePeerConnected().sendHaveMessage(pieceI);
