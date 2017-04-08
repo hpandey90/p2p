@@ -499,8 +499,17 @@ public class peerProcess {
                     	// for every peerThread in the peersList
                     	for (PeerThread p : listOfPeers) {
 
-                    		// set the stop flag for peer to be true
-                    		p.setToStop(true);
+                    		// set the Peerthread toStop to true
+                    		p.toStop = true;
+                    		try {
+                                // before exiting check if peerSocket is already closed, if no close it
+                                if(p.peerSocket.isClosed());
+                                else
+                                    p.peerSocket.close();
+                            } catch (IOException e) {
+                                System.out.println("Could not close socket:");
+                                e.printStackTrace();
+                            }
 
                     		// interrupt the peerThread to stop running
                             p.interrupt();

@@ -12,11 +12,11 @@ public class PeerThread extends Thread {
     private static final Logger LOGGER = MyLogger.getMyLogger();
    
     // Declare the peerSocket
-    private Socket peerSocket = null;
+    public Socket peerSocket = null;
     
     // Declare peer Manager object for peer and other related variables
     private PeerManager peerConnected = null;
-    private boolean toStop = false;
+    public boolean toStop = false;
     private boolean isClient = false;
     
     // Declare thread for handling the initialization of peer to peer communication 
@@ -31,27 +31,7 @@ public class PeerThread extends Thread {
         return new PeerManager(s);
     }
    
-    public boolean getToStop() {
-        return toStop;
-    }
-
-    public void setToStop(boolean b) {
-        if(b == true){
-            try {
-                // before exiting check if peer peerSocket is already closed, if no close it
-                if(peerSocket.isClosed());
-                else
-                    peerSocket.close();
-            } catch (IOException e) {
-                System.out.println("Could not close socket:");
-                e.printStackTrace();
-            }
-        }
-        
-        // set the toStop flag to passed value
-        toStop = b;
-    }
-
+    
     // PeerThread constructor
     public PeerThread(Socket psocket, boolean pisClient, int pid) throws IOException {
         
@@ -186,7 +166,7 @@ public class PeerThread extends Thread {
             InputStream inputStream = new BufferedInputStream(peerSocket.getInputStream());
             
             // each peer thread runs till not asked to toStop
-            while (!getToStop()) {
+            while (!toStop) {
                 
                 
                 byte[] messageBytesOfPeer = new byte[5];
@@ -454,7 +434,7 @@ public class PeerThread extends Thread {
             }
 
         } catch (IOException e) {
-            if(!getToStop()) {
+            if(!toStop) {
                 e.printStackTrace();
             }
         }finally {
