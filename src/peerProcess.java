@@ -467,6 +467,7 @@ public class peerProcess {
 
     	// Declare a runnable for determining the shut down process
     	final Runnable determineShutDown = new Runnable() {
+    		
             @Override
             public void run() {
 
