@@ -68,7 +68,7 @@ public class PeerThread extends Thread {
             
             // set the peerId(not myId) of peerManager object to the client's peerId and set the clientValue 
             peerConnected.setPeerId(pid);
-            peerConnected.setClientValue(true);
+            peerConnected.clientValue = true;
             
             // Send handshake message from the owner peer (retrieved from the commonConfig file written in peerProcess)
             // to the client peer. 
@@ -343,7 +343,7 @@ public class PeerThread extends Thread {
                         int pos = pieceI % 8;
                         PeerManager.setOwnerBitFieldIndex(index, pos);
                         
-                        for (PeerThread peerThread : peerProcess.peersList) {
+                        for (PeerThread peerThread : PeerProcess.peersList) {
                             
                             System.out.println("Reached Inside Piece Have check ");
                             peerThread.retrievePeerConnected().sendHaveMessage(pieceI);

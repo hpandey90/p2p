@@ -9,10 +9,10 @@ import java.util.logging.Logger;
 public class PeerManager {
 	
 	// Initialize optimisticallyUnchokedPeer with false. 
-    private boolean optimisticallyUnchokedPeer = false;
+    public boolean optimisticallyUnchokedPeer = false;
     
     // Initialize the client Peer value with false.
-    private boolean clientValue = false;
+    public boolean clientValue = false;
 
     // Initialize ownerId to zero.
     public static int ownerId = 0;
@@ -21,16 +21,16 @@ public class PeerManager {
     private static Map<Integer, Boolean> handshakeSucess = new HashMap<Integer, Boolean>();
 
     // Variable for peer id.
-    private int peerId;
+    public int peerId;
 
     // Variable to store the index of the requested piece of file.
-    private int indexOfRequestedPiece;
+    public int indexOfRequestedPiece;
     
     // Initialize the downloadRate value of peer to zero.
-    private long downloadRate = 0;
+    public long downloadRate = 0;
     
     // Flag to indicate if the Peer is initialized.
-    private Boolean isPeerInitialized = false;
+    public Boolean isPeerInitialized = false;
     
     // Socket variables
     private Socket socket = null;
@@ -94,9 +94,6 @@ public class PeerManager {
         clientValue = value;
     }
 
-    public boolean isClient() {
-        return clientValue;
-    }
 
     public synchronized  int getindexOfRequestedPiece() {
         return indexOfRequestedPiece;
