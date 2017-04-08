@@ -74,7 +74,7 @@ public class peerProcess {
         int p = Integer.parseInt(comProp.get("UnchokingInterval"));
 
         // Determine preferred neighbour peers
-        peerProcessObj.determinePreferredNeighbours(k, p);
+        peerProcessObj.determineKPreferredNeighbours(k, p);
 
         // Determine optimistically unchoked neighbour peers
         peerProcessObj.findOptUnchokedNeighbour(m);
@@ -200,12 +200,12 @@ public class peerProcess {
     /**
      * Determines k preferred neighbors every p seconds
      */
-    public void determinePreferredNeighbours(final int k, final int p) {
+    public void determineKPreferredNeighbours(final int k, final int p) {
 
     	try {
 
     		// Declare a runnable to determine k preferred neighbours every p seconds
-    		final Runnable kNeighborDeterminer = new Runnable() {
+    		final Runnable kNeighborFinder = new Runnable() {
 
     			public void run() {
 
@@ -213,18 +213,18 @@ public class peerProcess {
                     // calculate the downloading rate from each peer. set it initially to 0.
 
     				// Obtain the list of interested peers for the owner peer and select the k preferred neighbours from them
-    				List<PeerManager> interestedList = PeerManager.interestedPeers;
+    				List<PeerManager> listOfInterestedPeers = PeerManager.interestedPeers;
 
     				// Sort the list of peers in the interestedList using the peer comparator class based on download rates
-    				Collections.sort(interestedList, new PeerComparator<PeerManager>());
+    				Collections.sort(listOfInterestedPeers, new PeerComparator<PeerManager>());
 
     				// if interested list is non empty, select k peers which have the highest download rate
-                    if (interestedList != null) {
+                    if (listOfInterestedPeers != null) {
 
-                    	System.out.println("Interested list size is " + interestedList.size());
+                    	System.out.println("Interested list size is " + listOfInterestedPeers.size());
 
                     	// Declare an iterator for the interestedList of peers
-                    	Iterator<PeerManager> iterator = interestedList.iterator();
+                    	Iterator<PeerManager> it = listOfInterestedPeers.iterator();
 
                     	// Instantiate unchoke and choke peers synchronized lists
                     	listOfUnchokedPeers = Collections.synchronizedList(new ArrayList<PeerManager>());
@@ -232,12 +232,12 @@ public class peerProcess {
 
                     	int count = k;
 
-                        StringBuffer listOfUnchokedNeighbours = new StringBuffer(" ");
+                        StringBuffer unchokedNeighboursList = new StringBuffer(" ");
 
                         // Iterator through the interestedList of peers for owner peer
-                        while (iterator.hasNext()) {
+                        while (it.hasNext()) {
 
-                        	PeerManager next = iterator.next();
+                        	PeerManager next = it.next();
 
                         	// If the interested peer has been initialized
                         	if (next.getIsPeerInitialized()) {
@@ -257,7 +257,7 @@ public class peerProcess {
                                     	next.setChoked(false);
 
                                     	// if the selected interested peer is not optimisticallyUnchokedPeer
-                                    	if (!next.isOptimisticallyUnchokedPeer()) {
+                                    	if (!next.isOptUnchokedPeer()) {
 
                                     		System.out.println("Sending  unchoking msg " + next.getPeerId());
 
@@ -274,7 +274,7 @@ public class peerProcess {
                                     }
 
                                     // Add the selected interested peerId to the listOfUnchokedNeighbours
-                                    listOfUnchokedNeighbours.append(next.getPeerId() + ",");
+                                    unchokedNeighboursList.append(next.getPeerId() + ",");
 
                         		}
 
@@ -292,7 +292,7 @@ public class peerProcess {
                                     	next.setChoked(true);
 
                                     	// if the selected interested peer is not optimisticallyUnchokedPeer
-                                    	if (!next.isOptimisticallyUnchokedPeer()) {
+                                    	if (!next.isOptUnchokedPeer()) {
 
                                     		System.out.println("Sending  choke msg " + next.getPeerId());
 
@@ -314,7 +314,7 @@ public class peerProcess {
                         	count--;
                         }
 
-                        String neigh = listOfUnchokedNeighbours.toString();
+                        String neigh = unchokedNeighboursList.toString();
 
                         if (!neigh.trim().isEmpty()) {
 
@@ -327,7 +327,7 @@ public class peerProcess {
 
 
             // schedule the kNeighborDeterminer runnable to run after every p seconds using a ScheduledExectorService object
-            final ScheduledFuture<?> kNeighborDeterminerHandle = scheduler.scheduleAtFixedRate(kNeighborDeterminer, p, p, SECONDS);
+            final ScheduledFuture<?> kNeighborDeterminerHandle = scheduler.scheduleAtFixedRate(kNeighborFinder, p, p, SECONDS);
 
     	} catch (Exception e) {
 
