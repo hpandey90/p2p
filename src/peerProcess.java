@@ -39,8 +39,8 @@ public class peerProcess {
         CommonPeerConfig.retrieveCommonConfig().put("peerId", String.valueOf(peerId));
         scan.close();
 
-        // Obtain the hostname, listening port and has file or not values for the
-        // owner peerId(acting as server) from the peerInfo hashmap
+        // Obtain the host name, listening port and has file or not values for the
+        // owner peerId(acting as server) from the peerInfo hash map
         String string = CommonPeerConfig.retrievePeerInfo().get(peerId);
 
         // Initialize custom logger
@@ -52,17 +52,17 @@ public class peerProcess {
         }
 
         // Obtain the listening port for the owner peerId
-        String portNum = string.split(" ")[2];
+        String portNo = string.split(" ")[2];
 
         // Create a peerProcess object to start client peers and owner server peer connection communication processes
         peerProcess peerProcessOb = new peerProcess();
 
         // Connect the owner peer to all the available client peers in the peerInfo file with id < owner peerId
-        peerProcessOb.connectClient(peerId);
+        peerProcessOb.clientConnect(peerId);
 
         // Create a serverSocket for owner peer and start accepting connection requests from client peers
         // in a seperate thread each on its port number.
-        peerProcessOb.connectionAccept(peerId, Integer.valueOf(portNum));
+        peerProcessOb.acceptConnection(peerId, Integer.valueOf(portNo));
 
         // Create another peerProcess object to determinePreferredNeighbours,determineOptimisticallyUnchokedNeighbour & determineShutdownScheduler
         peerProcess peerProcessObj = new peerProcess();
@@ -88,37 +88,37 @@ public class peerProcess {
      * Connects to all available clients. PeerId is self myPeerId as to not to
      * connect to self or anyone with greater peer id.
      */
-    public void connectClient(int ownerPeerId) {
+    public void clientConnect(int myPeerId) {
 
     	// Obtain the peerInfo hashMap
-    	Map<Integer, String> peerInfo = CommonPeerConfig.retrievePeerInfo();
+    	Map<Integer, String> peerProp = CommonPeerConfig.retrievePeerInfo();
 
     	// Iterate by selecting all the peers with peerId < owner peerId
-        for (Integer s : peerInfo.keySet()) {
+        for (Integer s : peerProp.keySet()) {
 
-        	if (s < ownerPeerId) {
+        	if (s < myPeerId) {
 
         		// for every selected peer, obtain the client peerId, host and listening port from the peerProp map
-        		String line = peerInfo.get(s);
-                String[] arr = line.split(" ");
-                String peerId = arr[0];
-                String host = arr[1];
-                String portN = arr[2];
+        		String line = peerProp.get(s);
+                String[] split = line.split(" ");
+                String peerId = split[0];
+                String host = split[1];
+                String port = split[2];
 
                 try {
 
                 	// Create a socket for every selected client peer using its host name and the listening port
-                	Socket clientSocket = new Socket(host, Integer.parseInt(portN));
+                	Socket socket = new Socket(host, Integer.parseInt(port));
 
                 	// Create and start new peerThread process for each client peer by passing its socket, peerId
                 	// client peer thread initialization which has bitfield, interested/notinterested message exchange happens in the constructor
-                    PeerThread threadForPeer = new PeerThread(clientSocket, true, Integer.parseInt(peerId));
+                    PeerThread peerThread = new PeerThread(socket, true, Integer.parseInt(peerId));
 
                     // Start each selected client peer thread after it has been initialized above
-                    threadForPeer.start();
+                    peerThread.start();
 
                     // Add the peerThread to the synchronized peersList of the owner peer
-                    listOfPeers.add(threadForPeer);
+                    listOfPeers.add(peerThread);
 
                 } catch (NumberFormatException | IOException e) {
 
@@ -130,55 +130,54 @@ public class peerProcess {
         }
     }
 
-
     /**
      * Accepts connection for every peer in a separate thread..
      *
      * @param portNumber
      */
-    int peerIdGreaterCount = 0;
+    int greaterPeerCount = 0;
 
-    public void connectionAccept(int ownerPeerId, final int portNum) {
+    public void acceptConnection(int myPeerId, final int portNumber) {
 
     	// TODO : Determine to shut down this thread.
     	// Retreive the peerInfo hashmap into peerProp map
-    	Map<Integer, String> peerInfo = CommonPeerConfig.retrievePeerInfo();
+    	Map<Integer, String> peerProp = CommonPeerConfig.retrievePeerInfo();
 
     	// Count peers having id > owner peer id
-    	for (Integer s : peerInfo.keySet()) {
+    	for (Integer s : peerProp.keySet()) {
 
-    		if (s > ownerPeerId) {
-                peerIdGreaterCount++;
+    		if (s > myPeerId) {
+                greaterPeerCount++;
             }
         }
 
     	// Create a thread for accepting client peer connections
-        Thread threadAcceptingConn = new Thread() {
+        Thread connectionAcceptThread = new Thread() {
 
         	public void run() {
 
         		// Obtain a serverSocket for the owner peer using its portNumber
-        		try (ServerSocket serverSocket = new ServerSocket(portNum)) {
+        		try (ServerSocket serverSocket = new ServerSocket(portNumber)) {
 
-        			while (peerIdGreaterCount > 0) {
+        			while (greaterPeerCount > 0) {
 
         				// Start accepting the connection requests from the client peers using the serverSocket created
-        				Socket socketAccepted = serverSocket.accept();
+        				Socket acceptedSocket = serverSocket.accept();
 
         				// if owner's serverSocket accepts a client connection
-                        if (socketAccepted != null) {
+                        if (acceptedSocket != null) {
 
                         	// create a peerThread each for handling each clien peer request
-                        	PeerThread threadForPeer = new PeerThread(socketAccepted, false, -1);
+                        	PeerThread peerThread = new PeerThread(acceptedSocket, false, -1);
 
                         	// Start each peerThread created to accept each client peer connection request
-                        	threadForPeer.start();
+                        	peerThread.start();
 
                         	// Add the peerThread created to the peersList
-                            listOfPeers.add(threadForPeer);
+                            listOfPeers.add(peerThread);
 
                             // Decrement the greaterPeerCount
-                            peerIdGreaterCount--;
+                            greaterPeerCount--;
                         }
                     }
                 } catch (Exception e) {
@@ -190,10 +189,10 @@ public class peerProcess {
         };
 
         // Change the name of the thread for accepting client peer connections
-        threadAcceptingConn.setName("Connection Accepting Thread ");
+        connectionAcceptThread.setName("Connection Accepting Thread ");
 
         // Start the thread for accepting client peer connections
-        threadAcceptingConn.start();
+        connectionAcceptThread.start();
     }
 
 

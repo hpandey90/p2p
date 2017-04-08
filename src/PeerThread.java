@@ -162,7 +162,7 @@ public class PeerThread extends Thread {
         
         try {
             
-            // Retrive the input stream of peer's socket
+            // Retrieve the input stream of peer's socket
             InputStream inputStream = new BufferedInputStream(peerSocket.getInputStream());
             
             // each peer thread runs till not asked to toStop
