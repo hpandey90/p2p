@@ -152,6 +152,37 @@ public class PeerThread extends Thread {
 
     }
 
+public enum OriginalMessageTypes{
+        CHOKE((byte)0), 
+        UNCHOKE((byte)1), 
+        INTERESTED((byte)2), 
+        NOT_INTERESTED((byte)3), 
+        HAVE((byte)4), 
+        BITFIELD((byte)5), 
+        REQUEST((byte)6), 
+        PIECE((byte)7);
+        
+        byte messageValue = -1;
+        
+        private OriginalMessageTypes(byte b){
+            this.messageValue = b;
+        }
+    }
+   
+
+    public static OriginalMessageTypes getMsgType(byte[] msgStat) {
+
+        String s = Arrays.toString(msgStat);
+        
+        for (OriginalMessageTypes actMsgType : OriginalMessageTypes.values()) {
+        
+            if (actMsgType.messageValue == msgStat[4]) {
+                return actMsgType;
+            }
+        }
+        return null;
+    }
+
     @Override
     public void run() {
         // Handle peer communication following the initialization 
@@ -170,7 +201,8 @@ public class PeerThread extends Thread {
                 
                 byte[] messageBytesOfPeer = new byte[5];
                 messageBytesOfPeer = ByteArrayManipulation.readBytes(inputStream, messageBytesOfPeer, 5);
-                MessageTypes.OriginalMessageTypes msgType = MessagesUtil.getMsgType(messageBytesOfPeer);
+
+               OriginalMessageTypes msgType = getMsgType(messageBytesOfPeer);
                 
                 switch (msgType) {
                     

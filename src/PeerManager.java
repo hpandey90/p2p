@@ -9,6 +9,95 @@ import java.util.logging.Logger;
  */
 public class PeerManager {
 	
+
+public static final byte[] HANDSHAKE_BYTE_ARR = "P2PFILESHARINGPROJ".getBytes();
+    public static final byte[] ZERO_BITS = {0,0,0,0,0,0,0,0,0,0};
+    
+    public enum OriginalMessageTypes{
+        CHOKE((byte)0), 
+        UNCHOKE((byte)1), 
+        INTERESTED((byte)2), 
+        NOT_INTERESTED((byte)3), 
+        HAVE((byte)4), 
+        BITFIELD((byte)5), 
+        REQUEST((byte)6), 
+        PIECE((byte)7);
+        
+        byte messageValue = -1;
+        
+        private OriginalMessageTypes(byte b){
+            this.messageValue = b;
+        }
+    }
+   
+   public static byte[] getHandShakeMessage(int toPeerId) throws IOException {
+        return ByteArrayManipulation.mergeByteArrays(ByteArrayManipulation.mergeByteArrays(
+                HANDSHAKE_BYTE_ARR, ZERO_BITS), ByteArrayManipulation.intToByteArray(toPeerId));
+    }
+
+    public static byte[] getOriginalMessage(String payload, OriginalMessageTypes msgType) throws IOException {
+
+        int l = payload.getBytes().length;
+        byte[] msgL = ByteArrayManipulation.intToByteArray(l + 1); // plus one for message type
+        return ByteArrayManipulation.mergeByteArrays(msgL,
+                ByteArrayManipulation.mergeByteArray(msgType.messageValue, payload.getBytes()));
+    }
+
+    public static byte[] getOriginalMessage(OriginalMessageTypes msgType) throws IOException {
+        
+        byte[] msgL = ByteArrayManipulation.intToByteArray(1); // plus one for message type
+        return ByteArrayManipulation.mergeByte(msgL, msgType.messageValue);
+    }
+
+    public static byte[] getOriginalMessage(byte[] payload, OriginalMessageTypes msgType) throws IOException {
+        
+        byte[] msgL = ByteArrayManipulation.intToByteArray(payload.length + 1); // plus one for message type
+        return ByteArrayManipulation.mergeByteArrays(ByteArrayManipulation.mergeByte(msgL, msgType.messageValue), payload);
+    }
+
+
+    public static byte[] readOriginalMessage(InputStream in, OriginalMessageTypes bitfield) {
+        
+        byte[] lengthByte = new byte[4];
+        int read = -1;
+        byte[] data = null;
+        
+        try {
+            
+            read = in.read(lengthByte);
+            
+            if (read != 4) {
+                System.out.println("Message length is not proper!!!");
+            }
+            
+            int dataLength = ByteArrayManipulation.byteArrayToInt(lengthByte);
+            
+            //read msg type
+            byte[] msgType = new byte[1];
+            
+            in.read(msgType);
+            
+            if (msgType[0] == bitfield.messageValue) {
+                
+                int actualDataLength = dataLength - 1;
+                data = new byte[actualDataLength];
+                data = ByteArrayManipulation.readBytes(in, data, actualDataLength);
+                
+            } 
+            
+            else {
+                System.out.println("Wrong message type sent");
+            }
+
+        } catch (IOException e) {
+           
+            System.out.println("Could not read length of actual message");
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return data;
+    }
+    
 	// Initialize optimisticallyUnchokedPeer with false. 
     public boolean optimisticallyUnchokedPeer = false;
     
@@ -283,21 +372,7 @@ public class PeerManager {
         
         
     }
-
-    public void closeSocket() {
-        try {
-            socket.close();
-        } catch (IOException e) {
-            System.out.println("Exeception encountered while closing the socket."+e.getMessage());
-        }
-    }
-
-    @Override
-    public void finalize() {
-        this.closeSocket();
-    }
-    
-   
+ 
     //public synchronized void sndHandshakeMessage() throws IOException { -- see this
     public void sndHandshakeMessage() throws IOException {
         
@@ -379,7 +454,7 @@ public class PeerManager {
     		byte[] ownerBitField = getOwnerBitField();
     		
     		// create the actual message by merging message length, type and payload
-            byte[] actualMessage = MessagesUtil.getOriginalMessage(ownerBitField, MessageTypes.OriginalMessageTypes.BITFIELD);
+            byte[] actualMessage = getOriginalMessage(ownerBitField, OriginalMessageTypes.BITFIELD);
             
             // write the actual message in the peer socket's output stream 
             output.write(actualMessage);
@@ -394,22 +469,17 @@ public class PeerManager {
     public synchronized void readBitFieldMessageOfPeer() {
         
     	// read the array of bytes from client peer socket bufferedinputstream into bitFieldMessageOfPeer byte array
-    	bitFieldMesssageOfPeer = MessagesUtil.readOriginalMessage(input , MessageTypes.OriginalMessageTypes.BITFIELD);
+    	bitFieldMesssageOfPeer = readOriginalMessage(input , OriginalMessageTypes.BITFIELD);
     }
    
 
-    public void print(String s) {
-        System.out.println(s);
-    }
-
+    
     public synchronized boolean isInterested() {
         
     	int i = 0;
     	
     	// Obtain the ownerBitField byte array
         byte[] bitField = getOwnerBitField();
-        print("Bit field of owner peer is: " + Arrays.toString(bitField));
-        print("Bit field of peer is: " + Arrays.toString(bitFieldMesssageOfPeer));
         
         // byte array to store result of comparing owner peer and client peer bit field message values 
         byte[] ouput = new byte[bitField.length];
@@ -440,7 +510,7 @@ public class PeerManager {
     public synchronized void sendInterestedMessage() throws IOException {
         
     	// Obtains the concatenated msgL, messageValue of INTERESTED message 
-    	byte[] actualMessage = MessagesUtil.getOriginalMessage(MessageTypes.OriginalMessageTypes.INTERESTED);
+    	byte[] actualMessage = getOriginalMessage(OriginalMessageTypes.INTERESTED);
         
     	try {
     		
@@ -457,7 +527,7 @@ public class PeerManager {
     public synchronized void sendNotInterestedMessage() throws IOException {
         
     	// Obtains the concatenated msgL, messageValue of INTERESTED message
-    	byte[] originalMessage = MessagesUtil.getOriginalMessage(MessageTypes.OriginalMessageTypes.NOT_INTERESTED);
+    	byte[] originalMessage = getOriginalMessage(OriginalMessageTypes.NOT_INTERESTED);
         
     	try {
     		
@@ -479,9 +549,9 @@ public class PeerManager {
     
     // Send have message
     public synchronized void sendHaveMessage(int pieceIndex) throws IOException {
-        byte[] actualMessage = MessagesUtil.getOriginalMessage(
+        byte[] actualMessage = getOriginalMessage(
                 ByteArrayManipulation.intToByteArray(pieceIndex),
-                MessageTypes.OriginalMessageTypes.HAVE);
+                OriginalMessageTypes.HAVE);
         try {
             output.write(actualMessage);
             output.flush();
@@ -493,8 +563,7 @@ public class PeerManager {
     
     // Send choke message
     public synchronized  void sendChokeMessage() throws IOException {
-        byte[] actualMessage = MessagesUtil
-                .getOriginalMessage(MessageTypes.OriginalMessageTypes.CHOKE);
+        byte[] actualMessage = getOriginalMessage(OriginalMessageTypes.CHOKE);
         try {
             output.write(actualMessage);
             output.flush();
@@ -507,8 +576,7 @@ public class PeerManager {
 
     // Send unchoke message
     public synchronized void sendUnchokeMessage() throws IOException {
-        byte[] actualMessage = MessagesUtil
-                .getOriginalMessage(MessageTypes.OriginalMessageTypes.UNCHOKE);
+        byte[] actualMessage = getOriginalMessage(OriginalMessageTypes.UNCHOKE);
         try {
             output.write(actualMessage);
             output.flush();
@@ -539,8 +607,8 @@ public class PeerManager {
             byte[] pieceIndexByteArray = ByteArrayManipulation.intToByteArray(indexOfPiece);
 
             // obtain the request message by concatenating message length, message value and payload of request message
-            byte[] originalMessage = MessagesUtil.getOriginalMessage(
-                    pieceIndexByteArray, MessageTypes.OriginalMessageTypes.REQUEST);
+            byte[] originalMessage = getOriginalMessage(
+                    pieceIndexByteArray, OriginalMessageTypes.REQUEST);
             try {
                
             	// write the original request message created into the peer's socket output buffer
@@ -591,8 +659,8 @@ public class PeerManager {
         }
 
         // obtain the piece message by concatenating message length, message value and payload 
-        byte[] originalMessage = MessagesUtil.getOriginalMessage(data,
-                MessageTypes.OriginalMessageTypes.PIECE);
+        byte[] originalMessage = getOriginalMessage(data,
+                OriginalMessageTypes.PIECE);
         try {
             System.out.println("The actual message size is " + originalMessage.length);
             // write the created piece message into the peer's socket output stream
