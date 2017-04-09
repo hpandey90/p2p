@@ -372,6 +372,19 @@ public class PeerManager {
 
 
 	}
+	
+	public void closeSocket() {
+        try {
+            socket.close();
+        } catch (IOException e) {
+            System.out.println("Exeception encountered while closing the socket."+e.getMessage());
+        }
+    }
+
+    @Override
+    public void finalize() {
+        this.closeSocket();
+    }
 
 	//public synchronized void sndHandshakeMessage() throws IOException { -- see this
 	public void sndHandshakeMessage() throws IOException {
@@ -458,6 +471,7 @@ public class PeerManager {
 
 			// write the actual message in the peer socket's output stream 
 			output.write(actualMessage);
+			System.out.println("see2:"+Arrays.toString(actualMessage));
 			output.flush();
 
 		} catch (IOException e) {
@@ -469,6 +483,7 @@ public class PeerManager {
 	public synchronized void readBitFieldMessageOfPeer() {
 
 		// read the array of bytes from client peer socket bufferedinputstream into bitFieldMessageOfPeer byte array
+		System.out.println("see:"+this.socket.getPort());
 		bitFieldMesssageOfPeer = readOriginalMessage(input , OriginalMessageTypes.BITFIELD);
 	}
 
