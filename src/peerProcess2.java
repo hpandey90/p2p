@@ -229,7 +229,7 @@ public class peerProcess2 {
 										next.setChoked(false);
 
 										// if the selected interested peer is not optimisticallyUnchokedPeer
-										if (!next.isOptUnchokedPeer()) {
+										if (!next.optimisticallyUnchokedPeer) {
 
 											System.out.println("Sending  unchoking msg " + next.getPeerId());
 
@@ -264,7 +264,7 @@ public class peerProcess2 {
 										next.setChoked(true);
 
 										// if the selected interested peer is not optimisticallyUnchokedPeer
-										if (!next.isOptUnchokedPeer()) {
+										if (!next.optimisticallyUnchokedPeer) {
 
 											System.out.println("Sending  choke msg " + next.getPeerId());
 
@@ -345,7 +345,7 @@ public class peerProcess2 {
 
 						System.out.println("selecting a new  optimistcally neighbor");
 						// Set the value of optimistically unchoked peer as true for the peer
-						PeerManager.setOptUnchokedPeer(true);
+						PeerManager.optimisticallyUnchokedPeer = true;
 
 						try {
 
