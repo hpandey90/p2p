@@ -483,7 +483,7 @@ public class PeerManager {
 
 		// byte array to store result of comparing owner peer and client peer bit field message values 
 		byte[] ouput = new byte[bitField.length];
-
+		
 		// Perform a bitwise OR between ownerBitField and bitFieldMessageOfPeer and store result in output
 		for (byte byt : bitField) {
 			ouput[i] = (byte) (byt ^ bitFieldMesssageOfPeer[i]);

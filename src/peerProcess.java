@@ -99,7 +99,7 @@ public class peerProcess {
 			if (s.getKey() < ownerPeerId) {
 
 				// for every selected peer, obtain the client peerId, host and listening port from the peerProp map
-				String line = peerInfo.get(s);
+				String line = peerInfo.get(s.getKey());
 				String[] arr = line.split(" ");
 				String peerId = arr[0];
 				String host = arr[1];
