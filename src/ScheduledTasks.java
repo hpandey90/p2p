@@ -362,7 +362,7 @@ public class ScheduledTasks {
 					//lets write it to a file
 					System.out.println("Shut down the scheduled timer tasks..");
 
-					// Terminates this timer, discarding any currently scheduled tasks.
+					// Terminate the timers, discarding any currently scheduled tasks.
 					// Removes all cancelled tasks from this timer's task queue.
 					timer1.cancel();
 					timer1.purge();
@@ -373,20 +373,6 @@ public class ScheduledTasks {
 					timer3.cancel();
 					timer3.purge();
 
-					// if the scheduler has not been successfully shut down
-					if (!scheduler.isShutdown()) {
-
-						System.out.println("Unsuccessful shut down.");
-					}
-					try {
-
-						// Blocks until all tasks have completed execution after a shutdown request,
-						// or the timeout occurs, or the current thread is interrupted, whichever happens first.
-						scheduler.awaitTermination(5, SECONDS);
-					} catch (InterruptedException e) {
-
-						e.printStackTrace();
-					}
 				}
 			}
 
