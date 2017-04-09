@@ -74,13 +74,6 @@ public class PeerManager {
     public static Map<Integer, Long> peerDownloadTime = Collections.synchronizedMap(new HashMap<Integer, Long>());
     
     
-    public boolean isOptUnchokedPeer(){
-        return  optimisticallyUnchokedPeer;
-    }
-
-    public void setOptUnchokedPeer(boolean value){
-        optimisticallyUnchokedPeer = value;
-    }
     
     public synchronized long getPeerDownloadRate() {
         return downloadRate;
