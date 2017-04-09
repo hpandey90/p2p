@@ -475,8 +475,28 @@ public class PeerManager {
 
 
 	public synchronized boolean isInterested() {
+		
+        int i = 0;
+        byte[] myBitField = getOwnerBitField();
+        //print("My bit field is " + Arrays.toString(myBitField));
+        //print("Peers bit field is " + Arrays.toString(peerBitFieldMsg));
+        byte[] result = new byte[myBitField.length];
+        for (byte byt : myBitField) {
+            result[i] = (byte) (byt ^ bitFieldMesssageOfPeer[i]);
+            i++;
+        }
+        i = 0;
 
-		int i = 0;
+        for (byte b : myBitField) {
+
+            result[i] = (byte) (result[i] & ~b);
+            if (result[i] != 0) {
+                return true;
+            }
+        }
+        return false;
+
+		/*int i = 0;
 
 		// Obtain the ownerBitField byte array
 		byte[] bitField = getOwnerBitField();
@@ -502,7 +522,7 @@ public class PeerManager {
 			}
 		}
 
-		return false;
+		return false;*/
 
 	}
 
