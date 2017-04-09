@@ -8,718 +8,718 @@ import java.util.logging.Logger;
  * Class to encapsulate the Peer managing functionality.
  */
 public class PeerManager {
-	
-
-public static final byte[] HANDSHAKE_BYTE_ARR = "P2PFILESHARINGPROJ".getBytes();
-    public static final byte[] ZERO_BITS = {0,0,0,0,0,0,0,0,0,0};
-    
-    public enum OriginalMessageTypes{
-        CHOKE((byte)0), 
-        UNCHOKE((byte)1), 
-        INTERESTED((byte)2), 
-        NOT_INTERESTED((byte)3), 
-        HAVE((byte)4), 
-        BITFIELD((byte)5), 
-        REQUEST((byte)6), 
-        PIECE((byte)7);
-        
-        byte messageValue = -1;
-        
-        private OriginalMessageTypes(byte b){
-            this.messageValue = b;
-        }
-    }
-   
-   public static byte[] getHandShakeMessage(int toPeerId) throws IOException {
-        return ByteArrayManipulation.mergeByteArrays(ByteArrayManipulation.mergeByteArrays(
-                HANDSHAKE_BYTE_ARR, ZERO_BITS), ByteArrayManipulation.intToByteArray(toPeerId));
-    }
-
-    public static byte[] getOriginalMessage(String payload, OriginalMessageTypes msgType) throws IOException {
-
-        int l = payload.getBytes().length;
-        byte[] msgL = ByteArrayManipulation.intToByteArray(l + 1); // plus one for message type
-        return ByteArrayManipulation.mergeByteArrays(msgL,
-                ByteArrayManipulation.mergeByteArray(msgType.messageValue, payload.getBytes()));
-    }
-
-    public static byte[] getOriginalMessage(OriginalMessageTypes msgType) throws IOException {
-        
-        byte[] msgL = ByteArrayManipulation.intToByteArray(1); // plus one for message type
-        return ByteArrayManipulation.mergeByte(msgL, msgType.messageValue);
-    }
-
-    public static byte[] getOriginalMessage(byte[] payload, OriginalMessageTypes msgType) throws IOException {
-        
-        byte[] msgL = ByteArrayManipulation.intToByteArray(payload.length + 1); // plus one for message type
-        return ByteArrayManipulation.mergeByteArrays(ByteArrayManipulation.mergeByte(msgL, msgType.messageValue), payload);
-    }
 
 
-    public static byte[] readOriginalMessage(InputStream in, OriginalMessageTypes bitfield) {
-        
-        byte[] lengthByte = new byte[4];
-        int read = -1;
-        byte[] data = null;
-        
-        try {
-            
-            read = in.read(lengthByte);
-            
-            if (read != 4) {
-                System.out.println("Message length is not proper!!!");
-            }
-            
-            int dataLength = ByteArrayManipulation.byteArrayToInt(lengthByte);
-            
-            //read msg type
-            byte[] msgType = new byte[1];
-            
-            in.read(msgType);
-            
-            if (msgType[0] == bitfield.messageValue) {
-                
-                int actualDataLength = dataLength - 1;
-                data = new byte[actualDataLength];
-                data = ByteArrayManipulation.readBytes(in, data, actualDataLength);
-                
-            } 
-            
-            else {
-                System.out.println("Wrong message type sent");
-            }
+	public static final byte[] HANDSHAKE_BYTE_ARR = "P2PFILESHARINGPROJ".getBytes();
+	public static final byte[] ZERO_BITS = {0,0,0,0,0,0,0,0,0,0};
 
-        } catch (IOException e) {
-           
-            System.out.println("Could not read length of actual message");
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return data;
-    }
-    
+	public enum OriginalMessageTypes{
+		CHOKE((byte)0), 
+		UNCHOKE((byte)1), 
+		INTERESTED((byte)2), 
+		NOT_INTERESTED((byte)3), 
+		HAVE((byte)4), 
+		BITFIELD((byte)5), 
+		REQUEST((byte)6), 
+		PIECE((byte)7);
+
+		byte messageValue = -1;
+
+		private OriginalMessageTypes(byte b){
+			this.messageValue = b;
+		}
+	}
+
+	public static byte[] getHandShakeMessage(int toPeerId) throws IOException {
+		return ByteArrayManipulation.mergeByteArrays(ByteArrayManipulation.mergeByteArrays(
+				HANDSHAKE_BYTE_ARR, ZERO_BITS), ByteArrayManipulation.intToByteArray(toPeerId));
+	}
+
+	public static byte[] getOriginalMessage(String payload, OriginalMessageTypes msgType) throws IOException {
+
+		int l = payload.getBytes().length;
+		byte[] msgL = ByteArrayManipulation.intToByteArray(l + 1); // plus one for message type
+		return ByteArrayManipulation.mergeByteArrays(msgL,
+				ByteArrayManipulation.mergeByteArray(msgType.messageValue, payload.getBytes()));
+	}
+
+	public static byte[] getOriginalMessage(OriginalMessageTypes msgType) throws IOException {
+
+		byte[] msgL = ByteArrayManipulation.intToByteArray(1); // plus one for message type
+		return ByteArrayManipulation.mergeByte(msgL, msgType.messageValue);
+	}
+
+	public static byte[] getOriginalMessage(byte[] payload, OriginalMessageTypes msgType) throws IOException {
+
+		byte[] msgL = ByteArrayManipulation.intToByteArray(payload.length + 1); // plus one for message type
+		return ByteArrayManipulation.mergeByteArrays(ByteArrayManipulation.mergeByte(msgL, msgType.messageValue), payload);
+	}
+
+
+	public static byte[] readOriginalMessage(InputStream in, OriginalMessageTypes bitfield) {
+
+		byte[] lengthByte = new byte[4];
+		int read = -1;
+		byte[] data = null;
+
+		try {
+
+			read = in.read(lengthByte);
+
+			if (read != 4) {
+				System.out.println("Message length is not proper!!!");
+			}
+
+			int dataLength = ByteArrayManipulation.byteArrayToInt(lengthByte);
+
+			//read msg type
+			byte[] msgType = new byte[1];
+
+			in.read(msgType);
+
+			if (msgType[0] == bitfield.messageValue) {
+
+				int actualDataLength = dataLength - 1;
+				data = new byte[actualDataLength];
+				data = ByteArrayManipulation.readBytes(in, data, actualDataLength);
+
+			} 
+
+			else {
+				System.out.println("Wrong message type sent");
+			}
+
+		} catch (IOException e) {
+
+			System.out.println("Could not read length of actual message");
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return data;
+	}
+
 	// Initialize optimisticallyUnchokedPeer with false. 
-    public boolean optimisticallyUnchokedPeer = false;
-    
-    // Initialize the client Peer value with false.
-    public boolean clientValue = false;
+	public boolean optimisticallyUnchokedPeer = false;
 
-    // Initialize ownerId to zero.
-    public static int ownerId = 0;
-    
-    // Map to maintain list of Peers with successful handshakes. 
-    private static Map<Integer, Boolean> handshakeSucess = new HashMap<Integer, Boolean>();
+	// Initialize the client Peer value with false.
+	public boolean clientValue = false;
 
-    // Variable for peer id.
-    public int peerId;
+	// Initialize ownerId to zero.
+	public static int ownerId = 0;
 
-    // Variable to store the index of the requested piece of file.
-    public int indexOfRequestedPiece;
-    
-    // Initialize the downloadRate value of peer to zero.
-    public long downloadRate = 0;
-    
-    // Flag to indicate if the Peer is initialized.
-    public Boolean isPeerInitialized = false;
-    
-    // Socket variables
-    private Socket socket = null;
-    private OutputStream output = null;
-    private InputStream input = null;
-    
-    // Array of bytes of the file being shared.
-    private final static byte[] fileBitField;
+	// Map to maintain list of Peers with successful handshakes. 
+	private static Map<Integer, Boolean> handshakeSucess = new HashMap<Integer, Boolean>();
 
-    // Array of bytes to store the Bit fields of owner peer.
-    private final static byte[] ownerBitField;
-    
-    // Array of bytes to store the Bit fields of Requested byte.
-    private final static byte[] requestedBitField;
-    
-    // Array of bytes to store Bit field message of the peer.
-    private byte[] bitFieldMesssageOfPeer = null;
-    
-    // Array of bytes to store data shared between peers.
-    public static byte[] sharedDataArr = null;
-    
-    // Get the global logger.
- 	private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-    
-    // List to maintain the interested peers.
-    public static List<PeerManager> interestedPeers = Collections.synchronizedList(new ArrayList<PeerManager>());
-    
-    // Map to maintain the not interested peers.
-    public static Map<Integer, PeerManager> notinterestedPeers = Collections.synchronizedMap(new HashMap<Integer,PeerManager>());
+	// Variable for peer id.
+	public int peerId;
 
-    // Map to maintain 	Choked peers.
-    public static Map<Integer, PeerManager> chokedPeers = Collections.synchronizedMap(new HashMap<Integer, PeerManager>());
-    
-    // Map to maintain Unchoked peers.
-    public static Map<Integer, PeerManager> unchokedPeers = Collections.synchronizedMap(new HashMap<Integer, PeerManager>());
+	// Variable to store the index of the requested piece of file.
+	public int indexOfRequestedPiece;
 
-    // Map to maintain peer ID and requestTime pair values.
-    public static Map<Integer, Long> peerRequestTime = Collections.synchronizedMap(new HashMap<Integer, Long>());
+	// Initialize the downloadRate value of peer to zero.
+	public long downloadRate = 0;
 
-    // Map to maintain peer ID and downloadTime pair values.
-    public static Map<Integer, Long> peerDownloadTime = Collections.synchronizedMap(new HashMap<Integer, Long>());
-    
-    // Declare a reentrant lock -- see this 
-    private final ReentrantLock lock;
-    
-    
-    public synchronized long getPeerDownloadRate() {
-        return downloadRate;
-    }
+	// Flag to indicate if the Peer is initialized.
+	public Boolean isPeerInitialized = false;
 
-    public synchronized void setPeerDownloadRate(long rate) {
-        downloadRate = -rate;
-    }
+	// Socket variables
+	private Socket socket = null;
+	private OutputStream output = null;
+	private InputStream input = null;
 
-    public void setClientValue(boolean value) {
-        clientValue = value;
-    }
+	// Array of bytes of the file being shared.
+	private final static byte[] fileBitField;
+
+	// Array of bytes to store the Bit fields of owner peer.
+	private final static byte[] ownerBitField;
+
+	// Array of bytes to store the Bit fields of Requested byte.
+	private final static byte[] requestedBitField;
+
+	// Array of bytes to store Bit field message of the peer.
+	private byte[] bitFieldMesssageOfPeer = null;
+
+	// Array of bytes to store data shared between peers.
+	public static byte[] sharedDataArr = null;
+
+	// Get the global logger.
+	private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+
+	// List to maintain the interested peers.
+	public static List<PeerManager> interestedPeers = Collections.synchronizedList(new ArrayList<PeerManager>());
+
+	// Map to maintain the not interested peers.
+	public static Map<Integer, PeerManager> notinterestedPeers = Collections.synchronizedMap(new HashMap<Integer,PeerManager>());
+
+	// Map to maintain 	Choked peers.
+	public static Map<Integer, PeerManager> chokedPeers = Collections.synchronizedMap(new HashMap<Integer, PeerManager>());
+
+	// Map to maintain Unchoked peers.
+	public static Map<Integer, PeerManager> unchokedPeers = Collections.synchronizedMap(new HashMap<Integer, PeerManager>());
+
+	// Map to maintain peer ID and requestTime pair values.
+	public static Map<Integer, Long> peerRequestTime = Collections.synchronizedMap(new HashMap<Integer, Long>());
+
+	// Map to maintain peer ID and downloadTime pair values.
+	public static Map<Integer, Long> peerDownloadTime = Collections.synchronizedMap(new HashMap<Integer, Long>());
+
+	// Declare a reentrant lock -- see this 
+	private final ReentrantLock lock;
 
 
-    public synchronized  int getindexOfRequestedPiece() {
-        return indexOfRequestedPiece;
-    }
-    
-    public synchronized  void setindexOfRequestedPiece(int index) {
-        indexOfRequestedPiece = index;
-    }
+	public synchronized long getPeerDownloadRate() {
+		return downloadRate;
+	}
 
-    
-    public void setPeerId(int id) {
-        this.peerId = id;
-    }
+	public synchronized void setPeerDownloadRate(long rate) {
+		downloadRate = -rate;
+	}
 
-    public synchronized int getPeerId() {
-        return peerId;
-    }
+	public void setClientValue(boolean value) {
+		clientValue = value;
+	}
 
-    public static byte[] getFileBitfield() {
-        return fileBitField;
-    }
-   
-    public static synchronized byte[] getOwnerBitField() {
-        return ownerBitField;
-    }
 
-    public boolean getIsPeerInitialized(){
-        return isPeerInitialized;
-    }
-    
-    public synchronized  void setisPeerInitialized(boolean status){
-        isPeerInitialized = true;
-        notify();
-    }
+	public synchronized  int getindexOfRequestedPiece() {
+		return indexOfRequestedPiece;
+	}
 
-    public synchronized void waitToInitialize() {
-    	if (isPeerInitialized == false){
-    		do {
-    			try {
-    				System.out.println("Waiting to be initialized...");
-    				wait(900);
-    			} catch (Exception ex) {
-    				System.out.println("Exception encountered while waiting to be initialized." + ex.getMessage());
-    			}
-    		} while(isPeerInitialized == false);
-    	}
-    }
+	public synchronized  void setindexOfRequestedPiece(int index) {
+		indexOfRequestedPiece = index;
+	}
 
-    
 
-    public static synchronized byte[] getRequestedBitField() {
-        return requestedBitField;
-    }
+	public void setPeerId(int id) {
+		this.peerId = id;
+	}
 
-    public static synchronized void setOwnerBitFieldIndex(int index, int i) {
-        ownerBitField[index] |= (1 << (7 - i));
-    }
+	public synchronized int getPeerId() {
+		return peerId;
+	}
 
-    public static synchronized void setIndexOfPieceRequested(int index, int indexFromRight) {
-        requestedBitField[index] |= (1 << indexFromRight);
-    }
+	public static byte[] getFileBitfield() {
+		return fileBitField;
+	}
 
-    public static synchronized  void resetIndexOfPieceRequested(int index, int indexFromLeft) {
-           requestedBitField[index] &= ~(1 << (7 - indexFromLeft));
-    }
+	public static synchronized byte[] getOwnerBitField() {
+		return ownerBitField;
+	}
 
-    public synchronized byte[]  getbitFieldMessageOfPeer(){
-        return bitFieldMesssageOfPeer;
-    }
+	public boolean getIsPeerInitialized(){
+		return isPeerInitialized;
+	}
 
-    // One time execution block at the beginning for setting the bit fields of owner peer.
-    static {
-        
-    	// Obtain the fileName, fileSize and pieceSize from commonConfig file.
-    	String fileName = CommonPeerConfig.retrieveCommonConfig().get("FileName");
-        int fileSize = Integer.parseInt(CommonPeerConfig.retrieveCommonConfig().get("FileSize"));
-        int pieceSize = Integer.parseInt(CommonPeerConfig.retrieveCommonConfig().get("PieceSize"));
+	public synchronized  void setisPeerInitialized(boolean status){
+		isPeerInitialized = true;
+		notify();
+	}
 
-        // Calculate numOfPieces from fileSize and pieceSize.
-        long numOfPieces = 0;
-        if (fileSize % pieceSize == 0) {
-            numOfPieces = fileSize / pieceSize;
-        } else {
-            numOfPieces = fileSize / pieceSize + 1;
-        }
-        
-        
-        // Initialize owner, file and requested bit field byte array sizes as numOfPieces/8.
-        ownerBitField = new byte[(int) Math.ceil(numOfPieces / 8.0f)];
-        fileBitField = new byte[(int) Math.ceil(numOfPieces / 8.0f)];
-        requestedBitField = new byte[(int) Math.ceil(numOfPieces / 8.0f)];
-        
-        // Initialize sharedDataArr of bytes with size as FileSize.
-        sharedDataArr = new byte[Integer.parseInt(CommonPeerConfig.retrieveCommonConfig().get("FileSize"))];
-        
-        // Create a file
-        File f = new File(fileName);
-        
-        // if the mentioned file exists fill the ownerBitField array of bytes
-        if (f.exists()) 
-        {
-        	// error if file size mismatch
-            if (f.length() != fileSize) {
-                
-            	System.out.println("The Common.cfg file size which is:" + fileSize +" is different from "+ "Size of the actual file which is: " + f.length());
-                System.exit(-1);
-            } 
-            else {
-                
-            	FileInputStream fileInputStream = null;
-                
-            	try {
-                    
-            		// read from the file into the sharedDataArr of bytes
-            		fileInputStream = new FileInputStream(f);
-                    fileInputStream.read(sharedDataArr);
-                    fileInputStream.close();
-                
-            	} catch (Exception e) {
-                    e.printStackTrace();
-                }
+	public synchronized void waitToInitialize() {
+		if (isPeerInitialized == false){
+			do {
+				try {
+					System.out.println("Waiting to be initialized...");
+					wait(900);
+				} catch (Exception ex) {
+					System.out.println("Exception encountered while waiting to be initialized." + ex.getMessage());
+				}
+			} while(isPeerInitialized == false);
+		}
+	}
 
-            }
-            
-            // if numOfPieces exactly divisible by 8, set all bytes
-            if (numOfPieces % 8.0 == 0) {
-                Arrays.fill(ownerBitField, (byte) 255);
-            } 
-            else {
-                
-            	// get the number of bits set in the last byte from the remainder of numOfPieces % 8
-            	int numLastByteBitsSet = (int) numOfPieces % 8;
-                
-                // set all bytes to one.
-                Arrays.fill(ownerBitField, (byte) 255); 
-                
-                // reset spare bits of last byte to zero.
-                ownerBitField[ownerBitField.length - 1] = 0; 
-                
-                // Set only the numLastByteBitsSet bits of the last byte
-                while (numLastByteBitsSet != 0) {
-                    ownerBitField[ownerBitField.length - 1] |= (1 << (8 - numLastByteBitsSet));
-                    numLastByteBitsSet--;
-                }
-             }
-            }
-        
-        // if file does not exist, fill the fileBitField array of bytes
-        else {
-            
-        	// if numOfPieces exactly divisible by 8, set all bytes 
-        	if (numOfPieces % 8.0 == 0) {
-                Arrays.fill(fileBitField, (byte) 255);
-            } 
-        	
-        	else {
-                
-        		// get the number of bits set in the last byte from the remainder of numOfPieces % 8
-        		int numLastByteBitsSet = (int) numOfPieces % 8;
-                
-        		// set all bytes to one.
-                Arrays.fill(fileBitField, (byte) 255); 
-                
-                // reset spare bits of last byte to zero.
-                fileBitField[fileBitField.length - 1] = 0; 
-                
-                // Set only the numLastByteBitsSet bits of the last byte
-                while (numLastByteBitsSet != 0) {
-                    fileBitField[fileBitField.length - 1] |= (1 << (8 - numLastByteBitsSet));
-                    numLastByteBitsSet--;
-                }
-            }
-        }
 
-    }
 
-    // PeerManager constructor.
-    public PeerManager(Socket psocket) {
-        
-    	this.socket = psocket;
-    	// -- see this
-    	this.lock = new ReentrantLock();
-        try {
-        	// obtain output stream and input stream for passed peer socket
-            output = new BufferedOutputStream(socket.getOutputStream());
-            input = new BufferedInputStream(socket.getInputStream());
-        } catch (Exception ex) {
-            System.out.println("Socket Exception thrown."+ex.getMessage());
-        }
-        
-        
-        
-    }
- 
-    //public synchronized void sndHandshakeMessage() throws IOException { -- see this
-    public void sndHandshakeMessage() throws IOException {
-        
-    		lock.lock();
-    		try {
-    			// Send the handshake to the peer.
-    	    	synchronized (handshakeSucess) {
-    	            
-    	    		// Create the handshake message by concatenating the handshake header, zero bits and the owner peerId 
-    	    		// (retrieved from the commonConfig hashmap written in peerProcess).
-    	            byte[] concatenateByteArrays = ByteArrayManipulation.mergeByteArrays(ByteArrayManipulation.mergeByteArrays(MessageTypes.HANDSHAKE_BYTE_ARR, MessageTypes.ZERO_BITS),
-    	            		CommonPeerConfig.retrieveCommonConfig().get("peerId").getBytes());
-    	            
-    	            try {
-    	            	
-    	            	// write the owner's created handshake message in the BufferedOutputStream stream of the client socket
-    	                output.write(concatenateByteArrays);
-    	                output.flush();
-    	                
-    	                // if success, put the client peerId in the handshakeSuccess map of the owner peer.
-    	                handshakeSucess.put(peerId, false);
-    	            
-    	            } catch (IOException e) {
-    	                LOGGER.severe("Handshake sending failed." + e.getMessage());
-    	            }
-    	            
-    	        }
-    		}
-    		
-    		finally {lock.unlock();}
-    	
-    }
+	public static synchronized byte[] getRequestedBitField() {
+		return requestedBitField;
+	}
 
-    public synchronized int rcvHandshakeMessage() {
-        
-    	try {
-            byte[] byteArr = new byte[32];
-            
-            // Read from the peer(should be client) socket's bufferedinputstream into the byteArr. 
-            input.read(byteArr);
-            
-            // Obtain the peerId from the last four bytes of handshake message  
-            byte[] reqByteArrRange = Arrays.copyOfRange(byteArr, 28, 32);
-            Integer peerId = Integer.parseInt(new String(reqByteArrRange));
-            
-            // if a client peer
-            if (clientValue) {
-                
-            	// if the client peer exists in the handshakeSuccess map of owner peer and 
-            	// if this client's handshake has not been received yet
-            	if (handshakeSucess.containsKey(peerId) && handshakeSucess.get(peerId) == false) {
-                    
-            		// set the received handshake flag of client peer to true
-            		handshakeSucess.put(peerId, true);
-                    System.out.println("Valid peer id:" + peerId);
-                } 
-            	
-            	else {
-                    System.out.println("Invalid peer id:"+peerId);
-                }
-            
-            }
-            
-            // return the client's peerId which sent a handshake only in response to a handshake sent by owner peer.   
-            return peerId;
-        
-    	} catch (IOException e) {
-            e.printStackTrace();
-        }
-        
-    	return -1;
-    }
+	public static synchronized void setOwnerBitFieldIndex(int index, int i) {
+		ownerBitField[index] |= (1 << (7 - i));
+	}
 
-    // Sends a Message of type BitField
-    public synchronized void sndBitFieldMessageToPeer() {
-        
-    	try {
-            
-    		byte[] ownerBitField = getOwnerBitField();
-    		
-    		// create the actual message by merging message length, type and payload
-            byte[] actualMessage = getOriginalMessage(ownerBitField, OriginalMessageTypes.BITFIELD);
-            
-            // write the actual message in the peer socket's output stream 
-            output.write(actualMessage);
-            output.flush();
-        
-    	} catch (IOException e) {
-            System.out.println("Sending of bit field message failed."+e.getMessage());
-        }
-    	
-    }
+	public static synchronized void setIndexOfPieceRequested(int index, int indexFromRight) {
+		requestedBitField[index] |= (1 << indexFromRight);
+	}
 
-    public synchronized void readBitFieldMessageOfPeer() {
-        
-    	// read the array of bytes from client peer socket bufferedinputstream into bitFieldMessageOfPeer byte array
-    	bitFieldMesssageOfPeer = readOriginalMessage(input , OriginalMessageTypes.BITFIELD);
-    }
-   
+	public static synchronized  void resetIndexOfPieceRequested(int index, int indexFromLeft) {
+		requestedBitField[index] &= ~(1 << (7 - indexFromLeft));
+	}
 
-    
-    public synchronized boolean isInterested() {
-        
-    	int i = 0;
-    	
-    	// Obtain the ownerBitField byte array
-        byte[] bitField = getOwnerBitField();
-        
-        // byte array to store result of comparing owner peer and client peer bit field message values 
-        byte[] ouput = new byte[bitField.length];
-        
-        // Perform a bitwise OR between ownerBitField and bitFieldMessageOfPeer and store result in output
-        for (byte byt : bitField) {
-            ouput[i] = (byte) (byt ^ bitFieldMesssageOfPeer[i]);
-            i++;
-        }
-        
-        i = 0;
-        
-        // Compute bitwise AND between output and complement of ownerBitField to see if any bits exist in output which are not already in owner
-        // resulting in output holding bits in client which are not in owner.
-        // if resulting output is zero, implies client has no bits which are not already in owner.
-        for (byte b : bitField) {
-            ouput[i] = (byte) (ouput[i] & ~b);
-            if (ouput[i] != 0) {
-                return true;
-            }
-        }
-        
-        return false;
-    
-    }
+	public synchronized byte[]  getbitFieldMessageOfPeer(){
+		return bitFieldMesssageOfPeer;
+	}
 
-    // Sends a Message of type Interested
-    public synchronized void sendInterestedMessage() throws IOException {
-        
-    	// Obtains the concatenated msgL, messageValue of INTERESTED message 
-    	byte[] actualMessage = getOriginalMessage(OriginalMessageTypes.INTERESTED);
-        
-    	try {
-    		
-    		// write the INTERESTED message into the client socket bufferedoutputstream
-            output.write(actualMessage);
-            output.flush();
+	// One time execution block at the beginning for setting the bit fields of owner peer.
+	static {
 
-        } catch (IOException e) {
-            System.out.println("Sending of interested message failed: " + e.getMessage());
-        }
-    }
+		// Obtain the fileName, fileSize and pieceSize from commonConfig file.
+		String fileName = CommonPeerConfig.retrieveCommonConfig().get("FileName");
+		int fileSize = Integer.parseInt(CommonPeerConfig.retrieveCommonConfig().get("FileSize"));
+		int pieceSize = Integer.parseInt(CommonPeerConfig.retrieveCommonConfig().get("PieceSize"));
 
-    // Sends a Message of type NotInterested
-    public synchronized void sendNotInterestedMessage() throws IOException {
-        
-    	// Obtains the concatenated msgL, messageValue of INTERESTED message
-    	byte[] originalMessage = getOriginalMessage(OriginalMessageTypes.NOT_INTERESTED);
-        
-    	try {
-    		
-    		// write the NOT_INTERESTED message into the client socket bufferedoutputstream
-            output.write(originalMessage);
-            output.flush();
+		// Calculate numOfPieces from fileSize and pieceSize.
+		long numOfPieces = 0;
+		if (fileSize % pieceSize == 0) {
+			numOfPieces = fileSize / pieceSize;
+		} else {
+			numOfPieces = fileSize / pieceSize + 1;
+		}
 
-        } catch (IOException e) {
-            System.out.println("Sending of not interested message failed: " + e.getMessage());
-        }
-    }
-    
-   // Still working on it.
-    
-    // update the bitField Message of peer
-    public synchronized  void updateBitFieldMessageOfPeer(int indexOfPiece) {
-    	bitFieldMesssageOfPeer[indexOfPiece / 8] |= (1 << (7 - (indexOfPiece % 8)));
-    }
-    
-    // Send have message
-    public synchronized void sendHaveMessage(int pieceIndex) throws IOException {
-        byte[] actualMessage = getOriginalMessage(
-                ByteArrayManipulation.intToByteArray(pieceIndex),
-                OriginalMessageTypes.HAVE);
-        try {
-            output.write(actualMessage);
-            output.flush();
 
-        } catch (IOException e) {
-            System.out.println("io exception in reading " + e.getMessage());
-        }
-    }
-    
-    // Send choke message
-    public synchronized  void sendChokeMessage() throws IOException {
-        byte[] actualMessage = getOriginalMessage(OriginalMessageTypes.CHOKE);
-        try {
-            output.write(actualMessage);
-            output.flush();
+		// Initialize owner, file and requested bit field byte array sizes as numOfPieces/8.
+		ownerBitField = new byte[(int) Math.ceil(numOfPieces / 8.0f)];
+		fileBitField = new byte[(int) Math.ceil(numOfPieces / 8.0f)];
+		requestedBitField = new byte[(int) Math.ceil(numOfPieces / 8.0f)];
 
-        } catch (IOException e) {
-            System.out.println("io exception in reading " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
+		// Initialize sharedDataArr of bytes with size as FileSize.
+		sharedDataArr = new byte[Integer.parseInt(CommonPeerConfig.retrieveCommonConfig().get("FileSize"))];
 
-    // Send unchoke message
-    public synchronized void sendUnchokeMessage() throws IOException {
-        byte[] actualMessage = getOriginalMessage(OriginalMessageTypes.UNCHOKE);
-        try {
-            output.write(actualMessage);
-            output.flush();
+		// Create a file
+		File f = new File(fileName);
 
-        } catch (IOException e) {
-            System.out.println("io exception in reading " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
+		// if the mentioned file exists fill the ownerBitField array of bytes
+		if (f.exists()) 
+		{
+			// error if file size mismatch
+			if (f.length() != fileSize) {
 
-    private boolean choked = true;
+				System.out.println("The Common.cfg file size which is:" + fileSize +" is different from "+ "Size of the actual file which is: " + f.length());
+				System.exit(-1);
+			} 
+			else {
 
-    public synchronized void setChoked(boolean n) {
-        choked = n;
-    }
+				FileInputStream fileInputStream = null;
 
-    public synchronized boolean isChoked() {
-        return choked;
-    }
+				try {
 
-    // Send request message
-    public synchronized void sendRequestMessage(int indexOfPiece) throws IOException {
-        
-    	// if the requested piece index is >=0
-    	if (indexOfPiece >= 0) {
-    		
-    		// obtain the byte array of requested pieceIndex
-            byte[] pieceIndexByteArray = ByteArrayManipulation.intToByteArray(indexOfPiece);
+					// read from the file into the sharedDataArr of bytes
+					fileInputStream = new FileInputStream(f);
+					fileInputStream.read(sharedDataArr);
+					fileInputStream.close();
 
-            // obtain the request message by concatenating message length, message value and payload of request message
-            byte[] originalMessage = getOriginalMessage(
-                    pieceIndexByteArray, OriginalMessageTypes.REQUEST);
-            try {
-               
-            	// write the original request message created into the peer's socket output buffer
-            	output.write(originalMessage);
-                output.flush();
-                
-                // Add the peer id and its time of request in the peerRequestTime hashmap
-                PeerManager.peerRequestTime.put(peerId, System.nanoTime());
-            
-            } catch (IOException e) {
-                
-            	System.out.println("Exception encountered while writing in sendRequestMessage:" + e.getMessage());
-                e.printStackTrace();
-            }
-        }
-    }
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 
-    // Send piece message
-    public synchronized void sendPieceMessage(int pieceIndex) throws IOException {
-        
-    	int pI = pieceIndex;
-        
-    	int pieceSizeFromFile = Integer.parseInt(CommonPeerConfig.retrieveCommonConfig().get(
-                "PieceSize"));
-        
-    	int startIndex = pieceSizeFromFile * pieceIndex;
-        
-    	int endIndex = startIndex + pieceSizeFromFile - 1;
-        
-    	if (endIndex >= sharedDataArr.length) {
-            endIndex = sharedDataArr.length - 1;
-        }
-        //special case
-        //if pieceSize is greater than the entire file left
+			}
 
-        byte[] data = new byte[endIndex - startIndex + 1 + 4]; // 4 is for pieceIndex
+			// if numOfPieces exactly divisible by 8, set all bytes
+			if (numOfPieces % 8.0 == 0) {
+				Arrays.fill(ownerBitField, (byte) 255);
+			} 
+			else {
 
-        // populate the piece index
-        byte[] pieceIndexByteArray = ByteArrayManipulation.intToByteArray(pieceIndex);
-        
-        for (int i = 0; i < 4; i++) {
-            data[i] = pieceIndexByteArray[i];
-        }
-        
-        // populate the data
-        for (int i = startIndex; i <= endIndex ; i++) {
-            data[i - startIndex + 4] = sharedDataArr[i];
-        }
+				// get the number of bits set in the last byte from the remainder of numOfPieces % 8
+				int numLastByteBitsSet = (int) numOfPieces % 8;
 
-        // obtain the piece message by concatenating message length, message value and payload 
-        byte[] originalMessage = getOriginalMessage(data,
-                OriginalMessageTypes.PIECE);
-        try {
-            System.out.println("The actual message size is " + originalMessage.length);
-            // write the created piece message into the peer's socket output stream
-            output.write(originalMessage);
-            output.flush();
-        } catch (IOException e) {
-            System.out.println("io exception in reading " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
+				// set all bytes to one.
+				Arrays.fill(ownerBitField, (byte) 255); 
 
-    // TODO: Test this function
-    public synchronized int getNextBitFieldIndexToRequest() {
-        
-    	/// request a piece owner peer doesn't have and did not request from other peers, 
-        // select next piece to request index randomly
-        byte[] reqstdUntilnow = getRequestedBitField();
-        byte[] ntHavendNtReqst = new byte[bitFieldMesssageOfPeer.length]; // to store bytes that I don't have
-        byte[] bitFieldReqAndHave = new byte[bitFieldMesssageOfPeer.length];
-        byte[] ownerbitfield = getOwnerBitField();
-        System.out.println("Arrays.toString(reqstdUntilnow) = " + Arrays.toString(reqstdUntilnow));
-        
-        for (int i = 0; i < reqstdUntilnow.length; i++) {
-            bitFieldReqAndHave[i] = (byte) (reqstdUntilnow[i] & ownerbitfield[i]);
-        }
-        
-        // determine bits I dont have.
-        for (int i = 0; i < bitFieldReqAndHave.length; i++) {
-            ntHavendNtReqst[i] = (byte) ((bitFieldReqAndHave[i] ^ bitFieldMesssageOfPeer[i]) & ~bitFieldReqAndHave[i]);
-        }
-        
-        System.out.println("Arrays.toString(peerBitFieldMsg) = " + Arrays.toString(bitFieldMesssageOfPeer));
-        System.out.println("Arrays.toString(getMyBitField()) = " + Arrays.toString(getOwnerBitField()));
-        System.out.println("Arrays.toString(bitFieldReqAndHave) = " + Arrays.toString(bitFieldReqAndHave));
-        System.out.println("Arrays.toString(ntHavendNtReqst) = " + Arrays.toString(ntHavendNtReqst));
+				// reset spare bits of last byte to zero.
+				ownerBitField[ownerBitField.length - 1] = 0; 
 
-        int count = 0;
-        int pos = 0;
-        for (int i = 0; i < ntHavendNtReqst.length; i++) {
-            count = 8 * i;
-            byte temp = ntHavendNtReqst[i];
-            Byte b = new Byte(temp);
+				// Set only the numLastByteBitsSet bits of the last byte
+				while (numLastByteBitsSet != 0) {
+					ownerBitField[ownerBitField.length - 1] |= (1 << (8 - numLastByteBitsSet));
+					numLastByteBitsSet--;
+				}
+			}
+		}
 
-            pos = 0;
-            while (temp != 0 && pos < 8) {
-                if ((temp & (1 << pos)) != 0) {
-                    setIndexOfPieceRequested(i, pos);
-                    pos = 7 - pos;
-                    int index = count + pos;
-                    setindexOfRequestedPiece(index);
-                    // set the ith bit as 1
-                    return index;
-                }
-                ++pos;
-            }
-        }
+		// if file does not exist, fill the fileBitField array of bytes
+		else {
 
-        System.out.println("Arrays.toString(myBitField) = " + Arrays.toString(getOwnerBitField()));
-        return -1;
-    }
-    
+			// if numOfPieces exactly divisible by 8, set all bytes 
+			if (numOfPieces % 8.0 == 0) {
+				Arrays.fill(fileBitField, (byte) 255);
+			} 
+
+			else {
+
+				// get the number of bits set in the last byte from the remainder of numOfPieces % 8
+				int numLastByteBitsSet = (int) numOfPieces % 8;
+
+				// set all bytes to one.
+				Arrays.fill(fileBitField, (byte) 255); 
+
+				// reset spare bits of last byte to zero.
+				fileBitField[fileBitField.length - 1] = 0; 
+
+				// Set only the numLastByteBitsSet bits of the last byte
+				while (numLastByteBitsSet != 0) {
+					fileBitField[fileBitField.length - 1] |= (1 << (8 - numLastByteBitsSet));
+					numLastByteBitsSet--;
+				}
+			}
+		}
+
+	}
+
+	// PeerManager constructor.
+	public PeerManager(Socket psocket) {
+
+		this.socket = psocket;
+		// -- see this
+		this.lock = new ReentrantLock();
+		try {
+			// obtain output stream and input stream for passed peer socket
+			output = new BufferedOutputStream(socket.getOutputStream());
+			input = new BufferedInputStream(socket.getInputStream());
+		} catch (Exception ex) {
+			System.out.println("Socket Exception thrown."+ex.getMessage());
+		}
+
+
+
+	}
+
+	//public synchronized void sndHandshakeMessage() throws IOException { -- see this
+	public void sndHandshakeMessage() throws IOException {
+
+		lock.lock();
+		try {
+			// Send the handshake to the peer.
+			synchronized (handshakeSucess) {
+
+				// Create the handshake message by concatenating the handshake header, zero bits and the owner peerId 
+				// (retrieved from the commonConfig hashmap written in peerProcess).
+				byte[] concatenateByteArrays = ByteArrayManipulation.mergeByteArrays(ByteArrayManipulation.mergeByteArrays(HANDSHAKE_BYTE_ARR, ZERO_BITS),
+						CommonPeerConfig.retrieveCommonConfig().get("peerId").getBytes());
+
+				try {
+
+					// write the owner's created handshake message in the BufferedOutputStream stream of the client socket
+					output.write(concatenateByteArrays);
+					output.flush();
+
+					// if success, put the client peerId in the handshakeSuccess map of the owner peer.
+					handshakeSucess.put(peerId, false);
+
+				} catch (IOException e) {
+					LOGGER.severe("Handshake sending failed." + e.getMessage());
+				}
+
+			}
+		}
+
+		finally {lock.unlock();}
+
+	}
+
+	public synchronized int rcvHandshakeMessage() {
+
+		try {
+			byte[] byteArr = new byte[32];
+
+			// Read from the peer(should be client) socket's bufferedinputstream into the byteArr. 
+			input.read(byteArr);
+
+			// Obtain the peerId from the last four bytes of handshake message  
+			byte[] reqByteArrRange = Arrays.copyOfRange(byteArr, 28, 32);
+			Integer peerId = Integer.parseInt(new String(reqByteArrRange));
+
+			// if a client peer
+			if (clientValue) {
+
+				// if the client peer exists in the handshakeSuccess map of owner peer and 
+				// if this client's handshake has not been received yet
+				if (handshakeSucess.containsKey(peerId) && handshakeSucess.get(peerId) == false) {
+
+					// set the received handshake flag of client peer to true
+					handshakeSucess.put(peerId, true);
+					System.out.println("Valid peer id:" + peerId);
+				} 
+
+				else {
+					System.out.println("Invalid peer id:"+peerId);
+				}
+
+			}
+
+			// return the client's peerId which sent a handshake only in response to a handshake sent by owner peer.   
+			return peerId;
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return -1;
+	}
+
+	// Sends a Message of type BitField
+	public synchronized void sndBitFieldMessageToPeer() {
+
+		try {
+
+			byte[] ownerBitField = getOwnerBitField();
+
+			// create the actual message by merging message length, type and payload
+			byte[] actualMessage = getOriginalMessage(ownerBitField, OriginalMessageTypes.BITFIELD);
+
+			// write the actual message in the peer socket's output stream 
+			output.write(actualMessage);
+			output.flush();
+
+		} catch (IOException e) {
+			System.out.println("Sending of bit field message failed."+e.getMessage());
+		}
+
+	}
+
+	public synchronized void readBitFieldMessageOfPeer() {
+
+		// read the array of bytes from client peer socket bufferedinputstream into bitFieldMessageOfPeer byte array
+		bitFieldMesssageOfPeer = readOriginalMessage(input , OriginalMessageTypes.BITFIELD);
+	}
+
+
+
+	public synchronized boolean isInterested() {
+
+		int i = 0;
+
+		// Obtain the ownerBitField byte array
+		byte[] bitField = getOwnerBitField();
+
+		// byte array to store result of comparing owner peer and client peer bit field message values 
+		byte[] ouput = new byte[bitField.length];
+
+		// Perform a bitwise OR between ownerBitField and bitFieldMessageOfPeer and store result in output
+		for (byte byt : bitField) {
+			ouput[i] = (byte) (byt ^ bitFieldMesssageOfPeer[i]);
+			i++;
+		}
+
+		i = 0;
+
+		// Compute bitwise AND between output and complement of ownerBitField to see if any bits exist in output which are not already in owner
+		// resulting in output holding bits in client which are not in owner.
+		// if resulting output is zero, implies client has no bits which are not already in owner.
+		for (byte b : bitField) {
+			ouput[i] = (byte) (ouput[i] & ~b);
+			if (ouput[i] != 0) {
+				return true;
+			}
+		}
+
+		return false;
+
+	}
+
+	// Sends a Message of type Interested
+	public synchronized void sendInterestedMessage() throws IOException {
+
+		// Obtains the concatenated msgL, messageValue of INTERESTED message 
+		byte[] actualMessage = getOriginalMessage(OriginalMessageTypes.INTERESTED);
+
+		try {
+
+			// write the INTERESTED message into the client socket bufferedoutputstream
+			output.write(actualMessage);
+			output.flush();
+
+		} catch (IOException e) {
+			System.out.println("Sending of interested message failed: " + e.getMessage());
+		}
+	}
+
+	// Sends a Message of type NotInterested
+	public synchronized void sendNotInterestedMessage() throws IOException {
+
+		// Obtains the concatenated msgL, messageValue of INTERESTED message
+		byte[] originalMessage = getOriginalMessage(OriginalMessageTypes.NOT_INTERESTED);
+
+		try {
+
+			// write the NOT_INTERESTED message into the client socket bufferedoutputstream
+			output.write(originalMessage);
+			output.flush();
+
+		} catch (IOException e) {
+			System.out.println("Sending of not interested message failed: " + e.getMessage());
+		}
+	}
+
+	// Still working on it.
+
+	// update the bitField Message of peer
+	public synchronized  void updateBitFieldMessageOfPeer(int indexOfPiece) {
+		bitFieldMesssageOfPeer[indexOfPiece / 8] |= (1 << (7 - (indexOfPiece % 8)));
+	}
+
+	// Send have message
+	public synchronized void sendHaveMessage(int pieceIndex) throws IOException {
+		byte[] actualMessage = getOriginalMessage(
+				ByteArrayManipulation.intToByteArray(pieceIndex),
+				OriginalMessageTypes.HAVE);
+		try {
+			output.write(actualMessage);
+			output.flush();
+
+		} catch (IOException e) {
+			System.out.println("io exception in reading " + e.getMessage());
+		}
+	}
+
+	// Send choke message
+	public synchronized  void sendChokeMessage() throws IOException {
+		byte[] actualMessage = getOriginalMessage(OriginalMessageTypes.CHOKE);
+		try {
+			output.write(actualMessage);
+			output.flush();
+
+		} catch (IOException e) {
+			System.out.println("io exception in reading " + e.getMessage());
+			e.printStackTrace();
+		}
+	}
+
+	// Send unchoke message
+	public synchronized void sendUnchokeMessage() throws IOException {
+		byte[] actualMessage = getOriginalMessage(OriginalMessageTypes.UNCHOKE);
+		try {
+			output.write(actualMessage);
+			output.flush();
+
+		} catch (IOException e) {
+			System.out.println("io exception in reading " + e.getMessage());
+			e.printStackTrace();
+		}
+	}
+
+	private boolean choked = true;
+
+	public synchronized void setChoked(boolean n) {
+		choked = n;
+	}
+
+	public synchronized boolean isChoked() {
+		return choked;
+	}
+
+	// Send request message
+	public synchronized void sendRequestMessage(int indexOfPiece) throws IOException {
+
+		// if the requested piece index is >=0
+		if (indexOfPiece >= 0) {
+
+			// obtain the byte array of requested pieceIndex
+			byte[] pieceIndexByteArray = ByteArrayManipulation.intToByteArray(indexOfPiece);
+
+			// obtain the request message by concatenating message length, message value and payload of request message
+			byte[] originalMessage = getOriginalMessage(
+					pieceIndexByteArray, OriginalMessageTypes.REQUEST);
+			try {
+
+				// write the original request message created into the peer's socket output buffer
+				output.write(originalMessage);
+				output.flush();
+
+				// Add the peer id and its time of request in the peerRequestTime hashmap
+				PeerManager.peerRequestTime.put(peerId, System.nanoTime());
+
+			} catch (IOException e) {
+
+				System.out.println("Exception encountered while writing in sendRequestMessage:" + e.getMessage());
+				e.printStackTrace();
+			}
+		}
+	}
+
+	// Send piece message
+	public synchronized void sendPieceMessage(int pieceIndex) throws IOException {
+
+		int pI = pieceIndex;
+
+		int pieceSizeFromFile = Integer.parseInt(CommonPeerConfig.retrieveCommonConfig().get(
+				"PieceSize"));
+
+		int startIndex = pieceSizeFromFile * pieceIndex;
+
+		int endIndex = startIndex + pieceSizeFromFile - 1;
+
+		if (endIndex >= sharedDataArr.length) {
+			endIndex = sharedDataArr.length - 1;
+		}
+		//special case
+		//if pieceSize is greater than the entire file left
+
+		byte[] data = new byte[endIndex - startIndex + 1 + 4]; // 4 is for pieceIndex
+
+		// populate the piece index
+		byte[] pieceIndexByteArray = ByteArrayManipulation.intToByteArray(pieceIndex);
+
+		for (int i = 0; i < 4; i++) {
+			data[i] = pieceIndexByteArray[i];
+		}
+
+		// populate the data
+		for (int i = startIndex; i <= endIndex ; i++) {
+			data[i - startIndex + 4] = sharedDataArr[i];
+		}
+
+		// obtain the piece message by concatenating message length, message value and payload 
+		byte[] originalMessage = getOriginalMessage(data,
+				OriginalMessageTypes.PIECE);
+		try {
+			System.out.println("The actual message size is " + originalMessage.length);
+			// write the created piece message into the peer's socket output stream
+			output.write(originalMessage);
+			output.flush();
+		} catch (IOException e) {
+			System.out.println("io exception in reading " + e.getMessage());
+			e.printStackTrace();
+		}
+	}
+
+	// TODO: Test this function
+	public synchronized int getNextBitFieldIndexToRequest() {
+
+		/// request a piece owner peer doesn't have and did not request from other peers, 
+		// select next piece to request index randomly
+		byte[] reqstdUntilnow = getRequestedBitField();
+		byte[] ntHavendNtReqst = new byte[bitFieldMesssageOfPeer.length]; // to store bytes that I don't have
+		byte[] bitFieldReqAndHave = new byte[bitFieldMesssageOfPeer.length];
+		byte[] ownerbitfield = getOwnerBitField();
+		System.out.println("Arrays.toString(reqstdUntilnow) = " + Arrays.toString(reqstdUntilnow));
+
+		for (int i = 0; i < reqstdUntilnow.length; i++) {
+			bitFieldReqAndHave[i] = (byte) (reqstdUntilnow[i] & ownerbitfield[i]);
+		}
+
+		// determine bits I dont have.
+		for (int i = 0; i < bitFieldReqAndHave.length; i++) {
+			ntHavendNtReqst[i] = (byte) ((bitFieldReqAndHave[i] ^ bitFieldMesssageOfPeer[i]) & ~bitFieldReqAndHave[i]);
+		}
+
+		System.out.println("Arrays.toString(peerBitFieldMsg) = " + Arrays.toString(bitFieldMesssageOfPeer));
+		System.out.println("Arrays.toString(getMyBitField()) = " + Arrays.toString(getOwnerBitField()));
+		System.out.println("Arrays.toString(bitFieldReqAndHave) = " + Arrays.toString(bitFieldReqAndHave));
+		System.out.println("Arrays.toString(ntHavendNtReqst) = " + Arrays.toString(ntHavendNtReqst));
+
+		int count = 0;
+		int pos = 0;
+		for (int i = 0; i < ntHavendNtReqst.length; i++) {
+			count = 8 * i;
+			byte temp = ntHavendNtReqst[i];
+			Byte b = new Byte(temp);
+
+			pos = 0;
+			while (temp != 0 && pos < 8) {
+				if ((temp & (1 << pos)) != 0) {
+					setIndexOfPieceRequested(i, pos);
+					pos = 7 - pos;
+					int index = count + pos;
+					setindexOfRequestedPiece(index);
+					// set the ith bit as 1
+					return index;
+				}
+				++pos;
+			}
+		}
+
+		System.out.println("Arrays.toString(myBitField) = " + Arrays.toString(getOwnerBitField()));
+		return -1;
+	}
+
 }
