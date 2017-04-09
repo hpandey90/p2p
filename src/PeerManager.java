@@ -1,6 +1,7 @@
 import java.io.*;
 import java.net.Socket;
 import java.util.*;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Logger;
 
 /*
@@ -162,6 +163,8 @@ public static final byte[] HANDSHAKE_BYTE_ARR = "P2PFILESHARINGPROJ".getBytes();
     // Map to maintain peer ID and downloadTime pair values.
     public static Map<Integer, Long> peerDownloadTime = Collections.synchronizedMap(new HashMap<Integer, Long>());
     
+    // Declare a reentrant lock -- see this 
+    private final ReentrantLock lock;
     
     
     public synchronized long getPeerDownloadRate() {
@@ -356,6 +359,8 @@ public static final byte[] HANDSHAKE_BYTE_ARR = "P2PFILESHARINGPROJ".getBytes();
     public PeerManager(Socket psocket) {
         
     	this.socket = psocket;
+    	// -- see this
+    	this.lock = new ReentrantLock();
         try {
         	// obtain output stream and input stream for passed peer socket
             output = new BufferedOutputStream(socket.getOutputStream());
@@ -364,33 +369,40 @@ public static final byte[] HANDSHAKE_BYTE_ARR = "P2PFILESHARINGPROJ".getBytes();
             System.out.println("Socket Exception thrown."+ex.getMessage());
         }
         
-    }
-
-
-    public synchronized void sndHandshakeMessage() throws IOException {
         
-    	// Send the handshake to the peer.
-    	synchronized (handshakeSucess) {
-            
-    		// Create the handshake message by concatenating the handshake header, zero bits and the owner peerId 
-    		// (retrieved from the commonConfig hashmap written in peerProcess).
-            byte[] concatenateByteArrays = ByteArrayManipulation.mergeByteArrays(ByteArrayManipulation.mergeByteArrays(HANDSHAKE_BYTE_ARR, MessageTypes.ZERO_BITS),
-            		CommonPeerConfig.retrieveCommonConfig().get("peerId").getBytes());
-            
-            try {
-            	
-            	// write the owner's created handshake message in the BufferedOutputStream stream of the client socket
-                output.write(concatenateByteArrays);
-                output.flush();
-                
-                // if success, put the client peerId in the handshakeSuccess map of the owner peer.
-                handshakeSucess.put(peerId, false);
-            
-            } catch (IOException e) {
-                LOGGER.severe("Handshake sending failed." + e.getMessage());
-            }
-            
-        }
+        
+    }
+ 
+    //public synchronized void sndHandshakeMessage() throws IOException { -- see this
+    public void sndHandshakeMessage() throws IOException {
+        
+    		lock.lock();
+    		try {
+    			// Send the handshake to the peer.
+    	    	synchronized (handshakeSucess) {
+    	            
+    	    		// Create the handshake message by concatenating the handshake header, zero bits and the owner peerId 
+    	    		// (retrieved from the commonConfig hashmap written in peerProcess).
+    	            byte[] concatenateByteArrays = ByteArrayManipulation.mergeByteArrays(ByteArrayManipulation.mergeByteArrays(MessageTypes.HANDSHAKE_BYTE_ARR, MessageTypes.ZERO_BITS),
+    	            		CommonPeerConfig.retrieveCommonConfig().get("peerId").getBytes());
+    	            
+    	            try {
+    	            	
+    	            	// write the owner's created handshake message in the BufferedOutputStream stream of the client socket
+    	                output.write(concatenateByteArrays);
+    	                output.flush();
+    	                
+    	                // if success, put the client peerId in the handshakeSuccess map of the owner peer.
+    	                handshakeSucess.put(peerId, false);
+    	            
+    	            } catch (IOException e) {
+    	                LOGGER.severe("Handshake sending failed." + e.getMessage());
+    	            }
+    	            
+    	        }
+    		}
+    		
+    		finally {lock.unlock();}
     	
     }
 
