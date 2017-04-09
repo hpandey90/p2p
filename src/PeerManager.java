@@ -471,6 +471,7 @@ public class PeerManager {
 
 			// write the actual message in the peer socket's output stream 
 			output.write(actualMessage);
+			System.out.println("see port for send bit:"+this.socket.getPort());
 			System.out.println("see2:"+Arrays.toString(actualMessage));
 			output.flush();
 
@@ -483,7 +484,7 @@ public class PeerManager {
 	public synchronized void readBitFieldMessageOfPeer() {
 
 		// read the array of bytes from client peer socket bufferedinputstream into bitFieldMessageOfPeer byte array
-		System.out.println("see:"+this.socket.getPort());
+		System.out.println("see port for read bit:"+this.socket.getPort());
 		bitFieldMesssageOfPeer = readOriginalMessage(input , OriginalMessageTypes.BITFIELD);
 	}
 
