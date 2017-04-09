@@ -77,13 +77,6 @@ public class PeerManager {
     // Declare a reentrant lock -- see this 
     private final ReentrantLock lock;
     
-    public boolean isOptUnchokedPeer(){
-        return  optimisticallyUnchokedPeer;
-    }
-
-    public void setOptUnchokedPeer(boolean value){
-        optimisticallyUnchokedPeer = value;
-    }
     
     public synchronized long getPeerDownloadRate() {
         return downloadRate;
