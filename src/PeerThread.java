@@ -168,7 +168,6 @@ public class PeerThread extends Thread {
             // each peer thread runs till not asked to toStop
             while (!toStop) {
                 
-                
                 byte[] messageBytesOfPeer = new byte[5];
                 messageBytesOfPeer = ByteArrayManipulation.readBytes(inputStream, messageBytesOfPeer, 5);
                 MessageTypes.OriginalMessageTypes msgType = MessagesUtil.getMsgType(messageBytesOfPeer);
