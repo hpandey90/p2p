@@ -16,48 +16,45 @@ import java.text.SimpleDateFormat;
 
 class LogFormatter extends Formatter {
 	public String format(LogRecord rc) {
-		StringBuffer buf = new StringBuffer(1000);
+		StringBuffer strBuffer = new StringBuffer(1000);
 		SimpleDateFormat date_format = new SimpleDateFormat("MMM dd,yyyy HH:mm:ss");
 		Date resultdate = new Date(rc.getMillis());
-		buf.append(date_format.format(resultdate));
-		buf.append(" ");
-		buf.append(rc.getMessage());
-		buf.append("\n");
-		return buf.toString();
+		strBuffer.append(date_format.format(resultdate));
+		strBuffer.append(" ");
+		strBuffer.append(rc.getMessage());
+		strBuffer.append("\n");
+		return strBuffer.toString();
 	}
 }
 
 public class MyLogger {
-	static private FileHandler logTxt;
-	static private LogFormatter formatterText;
+	static private FileHandler logFileHandler;
+	static private LogFormatter logTextHandler;
 	private static Logger logger;
 
 	static public void setup() throws IOException {
 
 		logger = Logger.getLogger(MyLogger.class.getName());
 		logger.setUseParentHandlers(false);
-
-		// suppress the logging output to the console
-		// Logger rootLogger = Logger.getGlobal();
 		Handler[] handlers = logger.getHandlers();
-		if (handlers != null && handlers.length > 0 && handlers[0] instanceof ConsoleHandler) {
+		if (handlers.length > 0 && handlers != null && handlers[0] instanceof ConsoleHandler) {
 			logger.removeHandler(handlers[0]);
 		}
 
 		logger.setLevel(Level.INFO);
 		String logDirName = "peer_" + CommonPeerConfig.retrieveCommonConfig().get("peerId");
         File directory = new File(logDirName);
-        if(!directory.isDirectory())
+        if(!directory.isDirectory()){
             directory.mkdir();
-        String logFileName =  directory.getPath() + File.separator + "log_peer_"
-                + CommonPeerConfig.retrieveCommonConfig().get("peerId") + ".log";
-        logTxt = new FileHandler(logFileName);
-		formatterText = new LogFormatter();
-		logTxt.setFormatter(formatterText);
-		logger.addHandler(logTxt);
+        }
+        logTextHandler = new LogFormatter();
+        String logFileName =  directory.getPath() + File.separator + "log_peer_"+ CommonPeerConfig.retrieveCommonConfig().get("peerId") + ".log";
+        logFileHandler = new FileHandler(logFileName);
+		logFileHandler.setFormatter(logTextHandler);
+		logger.addHandler(logFileHandler);
 	}
 
-	public static Logger getMyLogger() {
+	public static Logger getLogger() {
 		return logger;
 	}
 }

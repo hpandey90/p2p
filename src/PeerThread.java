@@ -9,7 +9,7 @@ import java.util.logging.Logger;
 public class PeerThread extends Thread {
    
     // Declare the logger
-    private static final Logger LOGGER = MyLogger.getMyLogger();
+    private static final Logger LOGGER = MyLogger.getLogger();
    
     // Declare the peerSocket
     public Socket peerSocket = null;
