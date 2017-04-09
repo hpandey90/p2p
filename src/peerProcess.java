@@ -12,7 +12,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 //testing
 public class peerProcess {
 
-	private static final Logger LOGGER = MyLogger.getLogger();
+	private static final Logger LOGGER = MyLogger.getMyLogger();
 
 	// Synchronized list to maintain all the connected client peers of owner peer
 	public static List<PeerThread> listOfPeers = Collections.synchronizedList(new ArrayList<PeerThread>());
@@ -556,7 +556,7 @@ public class peerProcess {
 	public void log(String msg) {
 		Logger logger = LOGGER;
 		if (logger == null) {
-			logger = MyLogger.getLogger();
+			logger = MyLogger.getMyLogger();
 		}
 		logger.info(msg);
 	}

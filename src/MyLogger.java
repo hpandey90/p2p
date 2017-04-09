@@ -54,7 +54,7 @@ public class MyLogger {
 		logger.addHandler(logFileHandler);
 	}
 
-	public static Logger getLogger() {
+	public static Logger getMyLogger() {
 		return logger;
 	}
 }

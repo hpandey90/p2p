@@ -9,7 +9,7 @@ import java.util.logging.Logger;
 public class PeerThread2 implements Runnable {
    
     // Declare the logger
-    private static final Logger LOGGER = MyLogger.getLogger();
+    private static final Logger LOGGER = MyLogger.getMyLogger();
    
     // Declare the peerSocket
     public Socket peerSocket = null;
