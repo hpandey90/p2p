@@ -4,12 +4,12 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.*;
 import java.util.logging.Logger;
-//testing
+
 public class peerProcess {
 
 	private static final Logger LOGGER = MyLogger.getMyLogger();
 
-	// Synchronized list to maintain all the connected client peers of owner peer
+	// Synchronized list to maintain all the connected peers of owner peer
 	public static List<PeerThread> listOfPeers = Collections.synchronizedList(new ArrayList<PeerThread>());
 
 	// List to maintain interested and unchoked peers
@@ -52,17 +52,8 @@ public class peerProcess {
 		// setup and start the client and server peer connections
 		peerProcessOb.peerConnectionSetup(peerId);
 
-		// Create another peerProcess object to determinePreferredNeighbours,determineOptimisticallyUnchokedNeighbour & determineShutdownScheduler
-		peerProcess peerProcessObj = new peerProcess();
-		Map<String, String> comProp = CommonPeerConfig.retrieveCommonConfig();
-
-		// Retrieve the property values from the common config file
-		int m = Integer.parseInt(comProp.get("OptimisticUnchokingInterval"));
-		int k = Integer.parseInt(comProp.get("NumberOfPreferredNeighbors"));
-		int p = Integer.parseInt(comProp.get("UnchokingInterval"));
-
 		// schedule the tasks for determining k preferred neighbours and optimistically unchoked neighbour peers
-		ScheduledTasks st = new ScheduledTasks(peerProcessObj, m, k ,p);
+		PeerSchedules st = new PeerSchedules(new peerProcess());
 	}
 
 	/*

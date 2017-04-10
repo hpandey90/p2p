@@ -4,11 +4,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class ScheduledTasks {
+public class PeerSchedules {
 
 	// Declare variable for previousOptUnchokedPeer
 	PeerManager previousOptUnchokedPeer;
@@ -26,12 +27,16 @@ public class ScheduledTasks {
 	int k;
 
 	//  class constructor
-	public ScheduledTasks (peerProcess pp, int m, int k , int p) {
+	public PeerSchedules (peerProcess pp) {
 
 		this.pp = pp;
-		this.p = p;
-		this.m = m;
-		this.k =k;
+		
+		Map<String, String> comProp = CommonPeerConfig.retrieveCommonConfig();
+		
+		// Retrieve the common peer configuration values for scheduling tasks from common config file
+		int m = Integer.parseInt(comProp.get("OptimisticUnchokingInterval"));
+		int k = Integer.parseInt(comProp.get("NumberOfPreferredNeighbors"));
+		int p = Integer.parseInt(comProp.get("UnchokingInterval"));
 
 		// schedule the determining k preferred neighbours task every p seconds
 		timer1 = new Timer();
