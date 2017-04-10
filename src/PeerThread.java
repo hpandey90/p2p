@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.logging.Logger;
 
 /**
- * Class for handling thread managing functionality for peers
+ * Class for handling thread managing functionality for peers(client/server)
  */
 public class PeerThread implements Runnable {
    
