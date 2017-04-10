@@ -464,7 +464,6 @@ public class PeerManager {
 			// create the actual message by merging message length, type and payload
 			byte[] actualMessage = getOriginalMessage(ownerBitField, OriginalMessageTypes.BITFIELD);
 
-			//byte[] actualMessage = {0,0,0,2,5,-8};
 			// write the actual message in the peer socket's output stream 
 			output.write(actualMessage);
 			System.out.println("see port for send bit:"+this.socket.getPort());
