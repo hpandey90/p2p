@@ -26,13 +26,13 @@ public class ByteArrayManipulation {
         return byteArray;*/
         int len = length;
         int idx = 0;
-        while (len > 0) {
-        	System.out.println("entered readBytes while loop:"+len);
+        while (len != 0) {
+        	//System.out.println("entered readBytes while loop:"+len);
             int dataAvailableLength = in.available();
-            System.out.println("checking if data available"+ dataAvailableLength);
+            //System.out.println("checking if data available"+ dataAvailableLength);
             int read = Math.min(len, dataAvailableLength);
             byte[] dataRead = new byte[read];
-            if (read > 0) {
+            if (read != 0) {
                 in.read(dataRead);
                 System.out.println("inside the if(read!=0)" + len);
                 byteArray = ByteArrayManipulation.mergeByteArrays(byteArray, idx, dataRead, read);
