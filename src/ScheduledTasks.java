@@ -35,7 +35,7 @@ public class ScheduledTasks {
 
 		// schedule the determining k preferred neighbours task every p seconds
 		timer1 = new Timer();
-		timer1.scheduleAtFixedRate(new SelectKPreferredNeighbours(this.pp), 0, p*1000);
+		timer1.scheduleAtFixedRate(new SelectKPreferredNeighbours(this.pp, k), 0, p*1000);
 
 		// schedule the determining optimistically unchoked neighbour task every m seconds
 		timer2 = new Timer();
@@ -52,9 +52,10 @@ public class ScheduledTasks {
 	class SelectKPreferredNeighbours extends TimerTask {
 
 		peerProcess pp;
-
-		public SelectKPreferredNeighbours (peerProcess pp) {
+		int k;
+		public SelectKPreferredNeighbours (peerProcess pp, int k) {
 			this.pp = pp;
+			this.k=k;
 		}    	
 
 		@Override
