@@ -221,7 +221,7 @@ public class PeerManager {
 			do {
 				try {
 					System.out.println("Waiting to be initialized...");
-					wait(900);
+					wait(1000);
 				} catch (Exception ex) {
 					System.out.println("Exception encountered while waiting to be initialized." + ex.getMessage());
 				}

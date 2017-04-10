@@ -34,7 +34,7 @@ public class ByteArrayManipulation {
             byte[] dataRead = new byte[read];
             if (read != 0) {
                 in.read(dataRead);
-                System.out.println("inside the if(read!=0)" + len);
+                //System.out.println("inside the if(read!=0)" + len);
                 byteArray = ByteArrayManipulation.mergeByteArrays(byteArray, idx, dataRead, read);
                 idx += read;
                 len -= read;
