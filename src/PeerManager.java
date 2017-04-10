@@ -387,10 +387,7 @@ public class PeerManager {
     }
 
 	//public synchronized void sndHandshakeMessage() throws IOException { -- see this
-	public void sndHandshakeMessage() throws IOException {
-
-		lock.lock();
-		try {
+	public synchronized void sndHandshakeMessage() throws  IOException {
 			// Send the handshake to the peer.
 			synchronized (handshakeSucess) {
 
@@ -413,10 +410,6 @@ public class PeerManager {
 				}
 
 			}
-		}
-
-		finally {lock.unlock();}
-
 	}
 
 	public synchronized int rcvHandshakeMessage() {
