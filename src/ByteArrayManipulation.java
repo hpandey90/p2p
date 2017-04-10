@@ -1,26 +1,14 @@
 import java.io.IOException;
-import java.io.InputStream;
+import java.util.Arrays;
+import java.io.*;
 
 /*
  * Class to perform various operations on Byte arrays.
  */
 public class ByteArrayManipulation {
     
-	public synchronized static byte[] readBytes(InputStream in, byte[] byteArray, int length) throws IOException {
+	public synchronized static byte[] readBytes(InputStream input, byte[] byteArr, int length) throws IOException {
         /*int len = length;
-        int index = 0;
-        int lenOfDataRead = Math.min(len, in.available());
-        while (len != 0) {
-            byte[] dataRead = new byte[Math.min(len, in.available())];
-            if (Math.min(len, in.available()) != 0) {
-                in.read(dataRead);
-                byteArray = ByteArrayManipulation.mergeByteArrays(byteArray, index, dataRead, lenOfDataRead);
-                index = index + lenOfDataRead;
-                len = len - lenOfDataRead;
-            }
-        }
-        return byteArray;*/
-        int len = length;
         int idx = 0;
         while (len != 0) {
         	//System.out.println("entered readBytes while loop:"+len);
@@ -36,7 +24,20 @@ public class ByteArrayManipulation {
                 len -= read;
             }
         }
-        return byteArray;
+        return byteArray;*/
+        int index = 0;
+        for (;length != 0;) {
+            int inputAvail = input.available();
+            //int readData = Math.min(length, inputAvail);
+            byte[] data = new byte[Math.min(length, inputAvail)];
+            if (Math.min(length, inputAvail) != 0) {
+                input.read(data);
+                byteArr = ByteArrayManipulation.mergeByteArrays(byteArr, index, data, Math.min(length, inputAvail));
+                index = index + Math.min(length, inputAvail);
+                length = length - Math.min(length, inputAvail);
+            }
+        }
+        return byteArr;
     }
 	
 	public static int byteArrayToInt(byte[] b) {
@@ -103,21 +104,29 @@ public class ByteArrayManipulation {
         System.arraycopy(a, 0, result, 0, a.length);
         System.arraycopy(b, 0, result, a.length, b.length);
         return result;
+        /*byte[] mergedByte = new byte[a.length + b.length];
+    	for(int i = 0;i<a.length; i++){
+    		mergedByte[i] = a[i];
+    	}
+    	for(int i = a.length;i< b.length; i++){
+    		mergedByte[i] = b[i];
+    	}
+    	return mergedByte;*/
      }
 
     public static byte[] mergeByteArrays(byte[] a, int aLength, byte[] b, int bLength) throws IOException {
-        /*byte[] result = new byte[aLength + bLength];
-        ByteArrayOutputStream output = new ByteArrayOutputStream( );
-    	output.write(a);
-    	output.write(b);
-
-    	result = output.toByteArray( );
-    	
-    	return result;*/
-    	 byte[] result = new byte[aLength + bLength];
-         System.arraycopy(a, 0, result, 0, aLength);
-         System.arraycopy(b, 0, result, aLength, bLength);
-         return result;
+        byte[] mergedByte = new byte[aLength + bLength];
+    	for(int i = 0;i<aLength; i++){
+    		mergedByte[i] = a[i];
+    	}
+    	for(int i = aLength;i<bLength; i++){
+    		mergedByte[i] = b[i];
+    	}
+    	/*result = new byte[aLength + bLength];
+		 System.arraycopy(a, 0, result, 0, aLength);
+		 System.arraycopy(b, 0, result, aLength, bLength);
+		 System.out.println("result22======>"+Arrays.toString(result));*/
+		 return mergedByte;
     }
 
     public static byte[] mergeByteArray(byte b, byte[] a) throws IOException {
@@ -130,10 +139,17 @@ public class ByteArrayManipulation {
     	result = output.toByteArray( );
     	
     	return result;*/
+    	/*
     	byte[] result = new byte[a.length + 1];
         System.arraycopy(a, 0, result, 0, a.length);
         result[a.length] = b;
-        return result;
+        return result;*/
+    	byte[] mergedByte = new byte[a.length + 1];
+    	for(int i = 0;i<=a.length; i++){
+    		mergedByte[i] = a[i];
+    	}
+    	mergedByte[a.length] = b;
+    	return mergedByte;
     }
     
     public static byte[] mergeByte(byte[] a, byte b) throws IOException {
@@ -146,10 +162,16 @@ public class ByteArrayManipulation {
     	result = output.toByteArray( );
     	
     	return result;*/
-    	 byte[] result = new byte[a.length + 1];
+    	 /*byte[] result = new byte[a.length + 1];
          System.arraycopy(a, 0, result, 0, a.length);
          result[a.length] = b;
-         return result;
+         return result;*/
+    	byte[] mergedByte = new byte[a.length + 1];
+    	for(int i = 0;i<a.length; i++){
+    		mergedByte[i] = a[i];
+    	}
+    	mergedByte[a.length] = b;
+    	return mergedByte;
     }
     
 }
