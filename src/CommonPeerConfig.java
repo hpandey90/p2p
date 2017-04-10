@@ -27,7 +27,7 @@ public class CommonPeerConfig {
 	static {
 		
 		try {
-			in = new BufferedReader(new FileReader("C:\\Users\\Harika\\workspace\\CNProject_Bittorrent\\src\\"+commonConfigFile));
+			in = new BufferedReader(new FileReader(commonConfigFile));
 
 			// Read the commonConfigFile lines using the BufferedReader into the commonConfig map.
 			String st = null;
@@ -57,7 +57,7 @@ public class CommonPeerConfig {
 		// Obtain the BufferedReader for the peerInfoFile.
 		try {
 			
-			in = new BufferedReader(new FileReader("C:\\Users\\Harika\\workspace\\CNProject_Bittorrent\\src\\"+peerInfoFile));
+			in = new BufferedReader(new FileReader(peerInfoFile));
 			
 
 			String str = null;
