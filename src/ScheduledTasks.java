@@ -23,13 +23,13 @@ public class ScheduledTasks {
 
 	// Declare class variables for peerProcess object 
 	// and one each for the time intervals and number of preferred neighbours
-	peerProcess2 pp;
+	peerProcess pp;
 	int p;
 	int m;
 	int k;
 
 	//  class constructor
-	public ScheduledTasks (peerProcess2 pp, int m, int k , int p) {
+	public ScheduledTasks (peerProcess pp, int m, int k , int p) {
 
 		this.pp = pp;
 		this.p = p;
@@ -54,9 +54,9 @@ public class ScheduledTasks {
 	 */
 	class SelectKPreferredNeighbours extends TimerTask {
 
-		peerProcess2 pp;
+		peerProcess pp;
 
-		public SelectKPreferredNeighbours (peerProcess2 pp) {
+		public SelectKPreferredNeighbours (peerProcess pp) {
 			this.pp = pp;
 		}    	
 
@@ -191,9 +191,9 @@ public class ScheduledTasks {
 	 */
 	class SelectOptUnchokedNeighbour extends TimerTask {
 
-		peerProcess2 pp;
+		peerProcess pp;
 
-		public SelectOptUnchokedNeighbour(peerProcess2 pp) {
+		public SelectOptUnchokedNeighbour(peerProcess pp) {
 			this.pp = pp;
 		}    	
 
@@ -306,9 +306,9 @@ public class ScheduledTasks {
 	 */
 	class DetermineShutDownProcess extends TimerTask {
 
-		peerProcess2 pp;
+		peerProcess pp;
 
-		public DetermineShutDownProcess(peerProcess2 pp) {
+		public DetermineShutDownProcess(peerProcess pp) {
 			this.pp = pp;
 		}    	
 
@@ -325,7 +325,7 @@ public class ScheduledTasks {
 				boolean shutDownFlag = true;
 
 				// for every peerThread in the peersList
-				for (PeerThread2 pt : pp.listOfPeers) {
+				for (PeerThread pt : pp.listOfPeers) {
 
 					// Obtain the bitField message of each peer
 					byte[] peerBitFieldMsg = pt.retrievePeerConnected().getbitFieldMessageOfPeer();
@@ -343,7 +343,7 @@ public class ScheduledTasks {
 				if (shutDownFlag) {
 
 					// for every peerThread in the peersList
-					for (PeerThread2 pt : pp.listOfPeers) {
+					for (PeerThread pt : pp.listOfPeers) {
 
 						// set the Peerthread toStop to true
 						pt.toStop = true;
