@@ -189,6 +189,7 @@ public class PeerThread2 implements Runnable {
         // Handle peer communication following the initialization 
 
         // Obtain isInitialized of peerConnected for checking if peer is initialized.
+    	peerConnected.waitToInitialize();
         peerConnected.getIsPeerInitialized();
         System.out.println("peerConnected.isInitialized() = " + peerConnected.getIsPeerInitialized());
         
