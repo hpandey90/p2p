@@ -15,6 +15,7 @@ import java.io.*;
 import java.text.SimpleDateFormat;
 
 class LogFormatter extends Formatter {
+	@Override
 	public String format(LogRecord rc) {
 		StringBuffer strBuffer = new StringBuffer(1000);
 		SimpleDateFormat date_format = new SimpleDateFormat("MMM dd,yyyy HH:mm:ss");

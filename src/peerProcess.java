@@ -3,13 +3,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.*;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.Logger;
-
-import static java.util.concurrent.TimeUnit.SECONDS;
 //testing
 public class peerProcess {
 
@@ -92,6 +86,7 @@ public class peerProcess {
 			if ( peerId == ownerPeerId) {
 
 				Thread serverThread = new Thread(new Runnable() {
+					@Override
 					public void run() {
 
 						try {
@@ -157,7 +152,6 @@ public class peerProcess {
 			}
 		}		
 	}
-
 
 	public void log(String msg) {
 		Logger logger = LOGGER;

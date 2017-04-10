@@ -1,4 +1,3 @@
-import static java.util.concurrent.TimeUnit.SECONDS;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -7,8 +6,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class ScheduledTasks {
@@ -60,6 +57,7 @@ public class ScheduledTasks {
 			this.pp = pp;
 		}    	
 
+		@Override
 		public void run() {
 
 			try {
@@ -197,6 +195,7 @@ public class ScheduledTasks {
 			this.pp = pp;
 		}    	
 
+		@Override
 		public void run(){
 
 			System.out.println("inside optimistically unchoked neighbour!!");
@@ -312,6 +311,7 @@ public class ScheduledTasks {
 			this.pp = pp;
 		}    	
 
+		@Override
 		public void run() {
 
 			// Obtain the bitField of owner peer
@@ -319,13 +319,13 @@ public class ScheduledTasks {
 			System.out.println("Arrays.toString(myBitField) = " + Arrays.toString(ownerBitField));
 
 			// if peersList size of owner peer equals the total number of peers in peerInfo config file
-			if (pp.listOfPeers.size() == CommonPeerConfig.retrievePeerInfo().size()) {
+			if (peerProcess.listOfPeers.size() == CommonPeerConfig.retrievePeerInfo().size()) {
 
 				// set the shut down flag to true
 				boolean shutDownFlag = true;
 
 				// for every peerThread in the peersList
-				for (PeerThread pt : pp.listOfPeers) {
+				for (PeerThread pt : peerProcess.listOfPeers) {
 
 					// Obtain the bitField message of each peer
 					byte[] peerBitFieldMsg = pt.retrievePeerConnected().getbitFieldMessageOfPeer();
@@ -343,7 +343,7 @@ public class ScheduledTasks {
 				if (shutDownFlag) {
 
 					// for every peerThread in the peersList
-					for (PeerThread pt : pp.listOfPeers) {
+					for (PeerThread pt : peerProcess.listOfPeers) {
 
 						// set the Peerthread toStop to true
 						pt.toStop = true;

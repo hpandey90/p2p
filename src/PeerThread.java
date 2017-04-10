@@ -81,7 +81,8 @@ public class PeerThread implements Runnable {
         // interested/not interested message communication as part of initial setup.
         initialSetupThread = new Thread() {
             
-            public void run() {
+            @Override
+			public void run() {
                 System.out.println("Peer connected is initialized " + peerConnected.getIsPeerInitialized());
                 
                 // send bitfield message from one peer to other
@@ -104,18 +105,6 @@ public class PeerThread implements Runnable {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-
-                    System.out.println("Sending interested message to  " + peerConnected.getPeerId());
-                    
-                    try {
-                        // send interested message to client peer
-                        peerConnected.sendInterestedMessage();
-                    } 
-                    catch (IOException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
-
                 } 
                 
                 // else, owner peer not interested in client peer
@@ -381,7 +370,7 @@ public class PeerThread implements Runnable {
                             peerConnected.sendNotInterestedMessage();
                         }
                         
-                        if(nxtidx == -1 && !(Arrays.equals(peerConnected.getOwnerBitField(), peerConnected.getbitFieldMessageOfPeer())))
+                        if(nxtidx == -1 && !(Arrays.equals(PeerManager.getOwnerBitField(), peerConnected.getbitFieldMessageOfPeer())))
                         {
                             System.out.println("bit fields are not  equal" + peerConnected.getPeerId() );
                             peerConnected.sendInterestedMessage();
@@ -450,7 +439,7 @@ public class PeerThread implements Runnable {
                         }
 
                         // if owner and client peer bit field messages are not equal
-                        if( nextIndexToRequest == -1 && !(Arrays.equals(peerConnected.getOwnerBitField(), peerConnected.getbitFieldMessageOfPeer())))
+                        if( nextIndexToRequest == -1 && !(Arrays.equals(PeerManager.getOwnerBitField(), peerConnected.getbitFieldMessageOfPeer())))
                         {
                             System.out.println("bit fields are not  equal in unchoke " + peerConnected.getPeerId() );
                             System.out.println("Sending interested");
