@@ -67,7 +67,7 @@ public class PeerManager {
 			read = in.read(lengthByte);
 
 			if (read != 4) {
-				System.out.println("Message length is not proper!!!");
+				System.out.println("Incorrent message length.");
 			}
 
 			int dataLength = ByteArrayManipulation.byteArrayToInt(lengthByte);
@@ -86,7 +86,7 @@ public class PeerManager {
 			} 
 
 			else {
-				System.out.println("Wrong message type sent");
+				System.out.println("Incorrect message type sent");
 			}
 
 		} catch (IOException e) {
@@ -95,6 +95,7 @@ public class PeerManager {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		System.out.println("returning in readoriginal");
 		return data;
 	}
 
