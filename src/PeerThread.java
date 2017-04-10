@@ -92,7 +92,6 @@ public class PeerThread extends Thread {
                 // check if owner has missing bit field present in client's bit field message, if yes -> interested
                 if (peerConnected.isInterested()) {
                     
-
                 	System.out.println("Sending interested message to  " + peerConnected.getPeerId());
                     
                 	try {

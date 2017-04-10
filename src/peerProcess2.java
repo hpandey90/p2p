@@ -112,8 +112,6 @@ public class peerProcess2 {
 								Socket acceptedSocket = serverSocket.accept();
 								PeerThread2 r = new PeerThread2(acceptedSocket, false, -1);
 								Thread listenThread = new Thread(r);						
-								// Change the name of peer thread
-								listenThread.setName("Peer Thread : " + peerId);
 								listenThread.start();
 								listOfPeers.add(r);
 
@@ -144,8 +142,6 @@ public class peerProcess2 {
 						clientSocket = new Socket( host, portN);
 						PeerThread2 r = new PeerThread2(clientSocket, true, peerId);
 						Thread clientThread = new Thread(r);
-						// Change the name of the client peer thread 
-						clientThread.setName("Client thread for Peer: "+ peerId);
 						clientThread.start();
 						listOfPeers.add(r);
 

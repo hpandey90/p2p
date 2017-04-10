@@ -11,7 +11,7 @@ import java.io.ByteArrayOutputStream;
 public class ByteArrayManipulation {
     
 	public synchronized static byte[] readBytes(InputStream in, byte[] byteArray, int length) throws IOException {
-        int len = length;
+        /*int len = length;
         int index = 0;
         int lenOfDataRead = Math.min(len, in.available());
         while (len != 0) {
@@ -23,16 +23,44 @@ public class ByteArrayManipulation {
                 len = len - lenOfDataRead;
             }
         }
+        return byteArray;*/
+        int len = length;
+        int idx = 0;
+        while (len != 0) {
+            int dataAvailableLength = in.available();
+            int read = Math.min(len, dataAvailableLength);
+            byte[] dataRead = new byte[read];
+            if (read != 0) {
+                in.read(dataRead);
+                byteArray = ByteArrayManipulation.mergeByteArrays(byteArray, idx, dataRead, read);
+                idx += read;
+                len -= read;
+            }
+        }
         return byteArray;
     }
 	
 	public static int byteArrayToInt(byte[] b) {
-    	return ByteBuffer.wrap(b).getInt();
+    	//return ByteBuffer.wrap(b).getInt();
+        int value = 0;
+        for (int i = 0; i < 4; i++) {
+            int shift = (4 - 1 - i) * 8;
+            value += (b[i] & 0x000000FF) << shift;
+        }
+        return value;
     }
 
-    public static byte[] intToByteArray(int value) {
+    public static byte[] intToByteArray(int integer) {
 
-    	ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        byte[] result = new byte[4];
+
+        result[0] = (byte) ((integer & 0xFF000000) >> 24);
+        result[1] = (byte) ((integer & 0x00FF0000) >> 16);
+        result[2] = (byte) ((integer & 0x0000FF00) >> 8);
+        result[3] = (byte) (integer & 0x000000FF);
+
+        return result;
+    	/*ByteArrayOutputStream bos = new ByteArrayOutputStream();
         ObjectOutput out = null;
 		try {
 			out = new ObjectOutputStream(bos);
@@ -59,34 +87,42 @@ public class ByteArrayManipulation {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-        return int_bytes;
+        return int_bytes;*/
         }
 
     
     public static byte[] mergeByteArrays(byte[] a, byte[] b) throws IOException {
     	
-    	ByteArrayOutputStream output = new ByteArrayOutputStream( );
+    	/*ByteArrayOutputStream output = new ByteArrayOutputStream( );
     	output.write( a );
     	output.write( b );
 
     	byte result[] = output.toByteArray( );
     	
-    	return result;
+    	return result;*/
+        byte[] result = new byte[a.length + b.length];
+        System.arraycopy(a, 0, result, 0, a.length);
+        System.arraycopy(b, 0, result, a.length, b.length);
+        return result;
      }
 
     public static byte[] mergeByteArrays(byte[] a, int aLength, byte[] b, int bLength) throws IOException {
-        byte[] result = new byte[aLength + bLength];
+        /*byte[] result = new byte[aLength + bLength];
         ByteArrayOutputStream output = new ByteArrayOutputStream( );
     	output.write(a);
     	output.write(b);
 
     	result = output.toByteArray( );
     	
-    	return result;
+    	return result;*/
+    	 byte[] result = new byte[aLength + bLength];
+         System.arraycopy(a, 0, result, 0, aLength);
+         System.arraycopy(b, 0, result, aLength, bLength);
+         return result;
     }
 
     public static byte[] mergeByteArray(byte b, byte[] a) throws IOException {
-        byte[] result = new byte[a.length + 1];
+        /*byte[] result = new byte[a.length + 1];
         
         ByteArrayOutputStream output = new ByteArrayOutputStream( );
     	output.write( a );
@@ -94,11 +130,15 @@ public class ByteArrayManipulation {
 
     	result = output.toByteArray( );
     	
-    	return result;
+    	return result;*/
+    	byte[] result = new byte[a.length + 1];
+        System.arraycopy(a, 0, result, 0, a.length);
+        result[a.length] = b;
+        return result;
     }
     
     public static byte[] mergeByte(byte[] a, byte b) throws IOException {
-        byte[] result = new byte[a.length + 1];
+        /*byte[] result = new byte[a.length + 1];
         
         ByteArrayOutputStream output = new ByteArrayOutputStream( );
     	output.write( a );
@@ -106,7 +146,11 @@ public class ByteArrayManipulation {
 
     	result = output.toByteArray( );
     	
-    	return result;
+    	return result;*/
+    	 byte[] result = new byte[a.length + 1];
+         System.arraycopy(a, 0, result, 0, a.length);
+         result[a.length] = b;
+         return result;
     }
     
 }

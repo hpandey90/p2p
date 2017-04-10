@@ -76,7 +76,7 @@ public class PeerManager {
 			byte[] msgType = new byte[1];
 
 			in.read(msgType);
-
+			System.out.println("hey:"+msgType[0]);
 			if (msgType[0] == bitfield.messageValue) {
 
 				int actualDataLength = dataLength - 1;
@@ -486,6 +486,7 @@ public class PeerManager {
 		// read the array of bytes from client peer socket bufferedinputstream into bitFieldMessageOfPeer byte array
 		System.out.println("see port for read bit:"+this.socket.getPort());
 		bitFieldMesssageOfPeer = readOriginalMessage(input , OriginalMessageTypes.BITFIELD);
+		System.out.println("returning"+this.socket.getPort());
 	}
 
 
@@ -494,8 +495,8 @@ public class PeerManager {
 		
         int i = 0;
         byte[] myBitField = getOwnerBitField();
-        //print("My bit field is " + Arrays.toString(myBitField));
-        //print("Peers bit field is " + Arrays.toString(peerBitFieldMsg));
+        System.out.println("My bit field is " + Arrays.toString(myBitField));
+        System.out.println("Peers bit field is " + Arrays.toString(getbitFieldMessageOfPeer()) + " " +Arrays.toString(bitFieldMesssageOfPeer) );
         byte[] result = new byte[myBitField.length];
         for (byte byt : myBitField) {
             result[i] = (byte) (byt ^ bitFieldMesssageOfPeer[i]);

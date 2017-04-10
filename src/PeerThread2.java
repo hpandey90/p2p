@@ -73,6 +73,10 @@ public class PeerThread2 implements Runnable {
 
         }
         
+        Thread thread = Thread.currentThread();
+        // Change the name of peerThread to the peerManager object's peerId(set above based on isClient).
+        thread.setName("Peer : " + peerConnected.getPeerId());
+        
         // Create a thread for the peerManager object for bitfield and 
         // interested/not interested message communication as part of initial setup.
         initialSetupThread = new Thread() {
