@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 
 public class peerProcess {
 
+	// Declare the logger
 	private static final Logger LOGGER = MyLogger.getMyLogger();
 
 	// Synchronized list to maintain all the connected peers of owner peer
@@ -42,9 +43,6 @@ public class peerProcess {
 			e.printStackTrace();
 			throw new RuntimeException("Problems with creating the log files");
 		}
-
-		// Obtain the listening port for the owner peerId
-		String portNum = string.split(" ")[2];
 
 		// Create a peerProcess object to start client peers and owner server peer connection communication processes
 		peerProcess peerProcessOb = new peerProcess();

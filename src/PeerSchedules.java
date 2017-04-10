@@ -2,6 +2,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -75,7 +76,12 @@ public class PeerSchedules {
 				List<PeerManager> listOfInterestedPeers = PeerManager.interestedPeers;
 
 				// Sort the list of peers in the interestedList using the peer comparator class based on download rates
-				Collections.sort(listOfInterestedPeers, new PeerComparator<PeerManager>());
+				
+				Collections.sort(listOfInterestedPeers, new Comparator<PeerManager>(){
+					public int compare(PeerManager pm1, PeerManager pm2) {
+						return (new Long(pm1.getPeerDownloadRate())).compareTo(new Long(pm2.getPeerDownloadRate()));
+					}
+				});
 
 				// if interested list is non empty, select k peers which have the highest download rate
 				if (listOfInterestedPeers != null) {
