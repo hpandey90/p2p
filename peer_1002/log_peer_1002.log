@@ -1,2 +1,9 @@
-Apr 10,2017 02:35:16 Peer 1002 initiated a connection to 1001
-Apr 10,2017 02:35:16 Peer 1002 received the not interested message from 1001
+Apr 10,2017 02:59:34 Peer 1002 initiated a connection to 1001
+Apr 10,2017 02:59:34 Peer 1002 received the interested message from 1001
+Apr 10,2017 02:59:36 Peer 1002 has the preferred neighbors  1001,
+Apr 10,2017 02:59:36 Peer 1002 received the have message from 1001
+Apr 10,2017 02:59:36 Peer 1002 received the have message from 1001
+Apr 10,2017 02:59:36 Peer 1002 received the have message from 1001
+Apr 10,2017 02:59:36 Peer 1002 received the have message from 1001
+Apr 10,2017 02:59:37 Peer 1002 received the have message from 1001
+Apr 10,2017 02:59:37 Peer 1002 received the not interested message from 1001
