@@ -82,7 +82,7 @@ public class peerProcess2 {
 		for (Map.Entry<Integer, String> s : peerInfo.entrySet()) {
 
 			// for every peer, obtain the peerId, host and listening port from the peerInfo map
-			String line = peerInfo.get(s);
+			String line = peerInfo.get(s.getKey());
 			String[] arr = line.split(" ");
 			int peerId = Integer.parseInt(arr[0]);
 			String host = arr[1];
