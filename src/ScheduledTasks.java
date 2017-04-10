@@ -200,10 +200,13 @@ public class ScheduledTasks {
 		public void run(){
 
 			System.out.println("inside optimistically unchoked neighbour!!");
-
+			int chokeListSize = 0;
+			
 			// Obtain the size of chokeList of owner peer
-			int chokeListSize = pp.listOfchokedPeers.size();
-			System.out.println("size = " + chokeListSize);
+			if (pp.listOfchokedPeers != null) {
+				chokeListSize = pp.listOfchokedPeers.size();
+				System.out.println("size = " + chokeListSize);
+			}
 
 			if (chokeListSize != 0) {
 
