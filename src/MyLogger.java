@@ -39,7 +39,7 @@ public class MyLogger {
             newDir.mkdir(); //create directory if doesn't exist
         }
         logTextHandler = new LogFormatter();
-        String logFileName =  newDir.getPath() + File.separator + "log_peer_"+ CommonPeerConfig.retrieveCommonConfig().get("peerId") + ".log";
+        String logFileName =  newDir.getPath() + File.separator + "log_peer_"+ PeerManager.ownerId + ".log";
         logFileHandler = new FileHandler(logFileName); //create new log file
 		logFileHandler.setFormatter(logTextHandler);
 		messageLog.addHandler(logFileHandler);
