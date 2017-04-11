@@ -45,7 +45,7 @@ public class MyLogger {
 		messageLog.addHandler(logFileHandler);
 	}
 
-	public static Logger getMyLogger() {
+	public static Logger loggerInstance() {
 		return messageLog;
 	}
 }
