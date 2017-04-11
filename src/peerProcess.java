@@ -29,12 +29,8 @@ public class peerProcess {
 		// set the ownerId of PeerManager
 		PeerManager.ownerId = peerId;
 
-		CommonPeerConfig.retrieveCommonConfig().put("peerId", String.valueOf(peerId));
+		//CommonPeerConfig.retrieveCommonConfig().put("peerId", String.valueOf(peerId));
 		scan.close();
-
-		// Obtain the hostname, listening port and has file or not values for the
-		// owner peerId(acting as server) from the peerInfo hashmap
-		String string = CommonPeerConfig.retrievePeerInfo().get(peerId);
 
 		// Initialize custom logger
 		try {
@@ -142,12 +138,12 @@ public class peerProcess {
 		}		
 	}
 
-	public void log(String msg) {
+	public void logging(String logMessage) {
 		Logger logger = LOGGER;
-		if (logger == null) {
+		if (logger != null){}
+		else
 			logger = MyLogger.getMyLogger();
-		}
-		logger.info(msg);
+		logger.info(logMessage);
 	}
 
 }

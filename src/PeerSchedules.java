@@ -12,9 +12,6 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class PeerSchedules {
 
-	// Declare variable for previousOptUnchokedPeer
-	PeerManager previousOptUnchokedPeer;
-
 	// Declare the timers for the three scheduled tasks
 	Timer timer1;
 	Timer timer2;
@@ -31,9 +28,9 @@ public class PeerSchedules {
 	public PeerSchedules (peerProcess pp) {
 
 		this.pp = pp;
-		
+
 		Map<String, String> comProp = CommonPeerConfig.retrieveCommonConfig();
-		
+
 		// Retrieve the common peer configuration values for scheduling tasks from common config file
 		int m = Integer.parseInt(comProp.get("OptimisticUnchokingInterval"));
 		int k = Integer.parseInt(comProp.get("NumberOfPreferredNeighbors"));
@@ -59,6 +56,7 @@ public class PeerSchedules {
 
 		peerProcess pp;
 		int k;
+
 		public SelectKPreferredNeighbours (peerProcess pp, int k) {
 			this.pp = pp;
 			this.k=k;
@@ -69,14 +67,12 @@ public class PeerSchedules {
 
 			try {
 
-				System.out.println("K preferred neighbours called");
-				// calculate the downloading rate from each peer. set it initially to 0.
+				System.out.println("Executing selection of K preferred neighbours task.");
 
 				// Obtain the list of interested peers for the owner peer and select the k preferred neighbours from them
 				List<PeerManager> listOfInterestedPeers = PeerManager.interestedPeers;
 
 				// Sort the list of peers in the interestedList using the peer comparator class based on download rates
-				
 				Collections.sort(listOfInterestedPeers, new Comparator<PeerManager>(){
 					public int compare(PeerManager pm1, PeerManager pm2) {
 						return (new Long(pm1.getPeerDownloadRate())).compareTo(new Long(pm2.getPeerDownloadRate()));
@@ -86,85 +82,43 @@ public class PeerSchedules {
 				// if interested list is non empty, select k peers which have the highest download rate
 				if (listOfInterestedPeers != null) {
 
-					System.out.println("Interested list size is " + listOfInterestedPeers.size());
-
-					// Declare an iterator for the interestedList of peers
-					Iterator<PeerManager> it = listOfInterestedPeers.iterator();
+					System.out.println("The size of list of interestedPeers is: " + listOfInterestedPeers.size());
 
 					// Instantiate unchoke and choke peers synchronized lists
 					pp.listOfUnchokedPeers = Collections.synchronizedList(new ArrayList<PeerManager>());
 					pp.listOfchokedPeers = Collections.synchronizedList(new ArrayList<PeerManager>());
 
-					int count = k;
-
-					StringBuffer unchokedNeighboursList = new StringBuffer(" ");
+					int neighbours = 0;
 
 					// Iterator through the interestedList of peers for owner peer
-					while (it.hasNext()) {
-
-						PeerManager next = it.next();
+					for(PeerManager pm : listOfInterestedPeers) {
 
 						// If the interested peer has been initialized
-						if (next.getIsPeerInitialized()) {
+						if (pm.getIsPeerInitialized()) {
 
-							// if <k preferred neighbbours have been determined
-							if (count > 0) {
+							// if <k preferred neighbours have been determined
+							if (neighbours > k) {
 
-								System.out.println("peerProcess.run unchoked " + next.getPeerId());
+								System.out.println("Start choking peer: " + pm.getPeerId());
 
-								// Add the peer to the unchoke list of the owner peer
-								pp.listOfUnchokedPeers.add(next);
-
-								// if the selected interested peer is choked previously
-								if (next.isChoked()) {
-
-									// unchoke it
-									next.setChoked(false);
-
-									// if the selected interested peer is not optimisticallyUnchokedPeer
-									if (!next.optimisticallyUnchokedPeer) {
-
-										System.out.println("Sending  unchoking msg " + next.getPeerId());
-
-										try {
-											// send unchoke message to it
-											next.sendUnchokeMessage();
-
-										} catch (IOException e) {
-
-											// TODO Auto-generated catch block
-											e.printStackTrace();
-										} // now expect recieve message
-									}
-								}
-
-								// Add the selected interested peerId to the listOfUnchokedNeighbours
-								unchokedNeighboursList.append(next.getPeerId() + ",");
-
-							}
-
-							// if k preferred neighbours have already been selected
-							else {
-
-								System.out.println("peerProcess.run choked " + next.getPeerId());
 								// add the selected interested peer to the chokeList of owner peer
-								pp.listOfchokedPeers.add(next);
+								pp.listOfchokedPeers.add(pm);
 
 								// if the selected interested peer is not previously choked
-								if (!next.isChoked()) {
+								if (!pm.isChoked()) {
 
 									// set the choked value for it to be true
-									next.setChoked(true);
+									pm.setChoked(true);
 
 									// if the selected interested peer is not optimisticallyUnchokedPeer
-									if (!next.optimisticallyUnchokedPeer) {
+									if (!pm.optimisticallyUnchokedPeer) {
 
-										System.out.println("Sending  choke msg " + next.getPeerId());
+										System.out.println("Send choke message to peer: " + pm.getPeerId());
 
 										try {
 
 											// send choke message to it
-											next.sendChokeMessage();
+											pm.sendChokeMessage();
 										} catch (IOException e) {
 
 											// TODO Auto-generated catch block
@@ -173,26 +127,48 @@ public class PeerSchedules {
 									}
 								}
 							}
+
+							// if k preferred neighbours have already been selected
+							else {
+
+								System.out.println("Start unchoking peer: " + pm.getPeerId());
+
+								// Add the peer to the unchoke list of the owner peer
+								pp.listOfUnchokedPeers.add(pm);
+
+								// if the selected interested peer is choked previously
+								if (pm.isChoked()) {
+
+									// unchoke it
+									pm.setChoked(false);
+
+									// if the selected interested peer is not optimisticallyUnchokedPeer
+									if (!pm.optimisticallyUnchokedPeer) {
+
+										System.out.println("Send unchoke message to peer: " + pm.getPeerId());
+
+										try {
+											// send unchoke message to it
+											pm.sendUnchokeMessage();
+
+										} catch (IOException e) {
+
+											// TODO Auto-generated catch block
+											e.printStackTrace();
+										} // now expect recieve message
+									}
+								}
+								pp.logging( pm.getPeerId() + " has been selected as one of the k preferred neighbours for peer "+ PeerManager.ownerId);
+							}
 						}
-
-						// decrement the count for selected preferred neighbours
-						count--;
+						// decrement the number of neighbours
+						neighbours--;
 					}
-
-					String neigh = unchokedNeighboursList.toString();
-
-					if (!neigh.trim().isEmpty()) {
-
-						pp.log("Peer " + PeerManager.ownerId + " has the preferred neighbors " + neigh);
-					}
-
 				};
-
 			} catch (Exception e) {
 
 				System.out.println(e.getMessage());
 			}
-
 		}
 	}
 
@@ -201,89 +177,25 @@ public class PeerSchedules {
 	 */
 	class SelectOptUnchokedNeighbour extends TimerTask {
 
+		// Declare variable for previousOptUnchokedPeer
+		PeerManager previousOptUnchokedPeer;
+
 		peerProcess pp;
 
 		public SelectOptUnchokedNeighbour(peerProcess pp) {
 			this.pp = pp;
+			this.previousOptUnchokedPeer = null; 
 		}    	
 
 		@Override
 		public void run(){
 
-			System.out.println("inside optimistically unchoked neighbour!!");
+			System.out.println("Entered selection of Optimistically Unchoked neighbours.");
+
 			int chokeListSize = 0;
-			
-			// Obtain the size of chokeList of owner peer
-			if (pp.listOfchokedPeers != null) {
-				chokeListSize = pp.listOfchokedPeers.size();
-				System.out.println("size = " + chokeListSize);
-			}
 
-			if (chokeListSize != 0) {
-
-				// Obtain a random index isolated to the current thread
-				int randomIndex = ThreadLocalRandom.current().nextInt(0, chokeListSize);
-
-				// Randomly select a peer from the choked peers list of owner peer optimistically
-				PeerManager PeerManager = pp.listOfchokedPeers.remove(randomIndex);
-
-				System.out.println("selecting an optimistcally neighbor");
-				System.out.println("randIndex = " + randomIndex);
-				System.out.println("Peer selected is " + PeerManager.getPeerId());
-
-				// if a peer is obtained by random selection and if it has not been selected previously
-				if (PeerManager != null && PeerManager != previousOptUnchokedPeer) {
-
-					System.out.println("selecting a new  optimistcally neighbor");
-					// Set the value of optimistically unchoked peer as true for the peer
-					PeerManager.optimisticallyUnchokedPeer = true;
-
-					try {
-
-						// send an unchoke message to the optimistically selected peer
-						PeerManager.sendUnchokeMessage();
-					} catch (IOException e1) {
-
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
-
-					// if previousOptimisticallyUnchokedPeer
-					if (previousOptUnchokedPeer != null) {
-
-						// set the value of the previous optimistically unchoked peer to false
-						previousOptUnchokedPeer.optimisticallyUnchokedPeer = false;
-
-						// if previous optimisticallyUnchokedPeer has been choked already
-						if (previousOptUnchokedPeer.isChoked()) {
-
-							System.out.println("Sending Choke msg from Optimistcally");
-
-							try {
-
-								// send choke message from it to the owner peer
-								previousOptUnchokedPeer.sendChokeMessage();
-
-							} catch (IOException e) {
-
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-
-						}
-					}
-
-					// reassign the previousOptimisticallyUnchokedPeer value to the current selected peer
-					previousOptUnchokedPeer = PeerManager;
-
-					pp.log("PeerManager " + PeerManager.ownerId + " has the optimistically unchoked neighbor " + "PeerManager " + PeerManager.ownerId);
-					System.out.println("Peer " + PeerManager.ownerId + " has the optimistically unchoked neighbor " + "Peer " + PeerManager.ownerId);
-				}
-
-			}
-
-			// if owner peer chokeList is null
-			else {
+			// if choke list is empty
+			if ((chokeListSize = pp.listOfchokedPeers.size()) == 0) {
 
 				// if previousOptimisticallyUnchokedPeer is not null
 				if (previousOptUnchokedPeer != null) {
@@ -291,10 +203,10 @@ public class PeerSchedules {
 					// set the value of the previous optimistically Unchoked peer to false
 					previousOptUnchokedPeer.optimisticallyUnchokedPeer = false;
 
-					// if previous optimistically Unchoked peer is already choked
+					// if previous optimistically unchoked peer has been choked
 					if (previousOptUnchokedPeer.isChoked()) {
 
-						System.out.println("Sending Choke msg from Optimistcally");
+						System.out.println("Send choke message from optimistically unchoked neighbour.");
 
 						try {
 
@@ -307,10 +219,74 @@ public class PeerSchedules {
 						}
 					}
 				}
-
 				// set the previous Optimistically unchoked peer to null
 				previousOptUnchokedPeer = null;
-			};
+
+
+			}
+
+			// if owner peer chokeList is non null
+			else {
+
+				System.out.println("Size of list of choked peers is :" + chokeListSize);
+
+				// Randomly select a peer from the choked peers list of currently executing owner peer thread   
+				PeerManager peerManager = pp.listOfchokedPeers.remove(ThreadLocalRandom.current().nextInt(0, chokeListSize));
+
+				System.out.println("Randomly selected optimistic peer: "+ peerManager.getPeerId());
+
+				// if a peer is obtained by random selection 
+				if (peerManager != null) {
+
+					// if it has not been selected previously
+					if (peerManager != previousOptUnchokedPeer) {
+
+						// Set the value of optimistically unchoked peer as true for the peer
+						peerManager.optimisticallyUnchokedPeer = true;
+
+						try {
+							// send an unchoke message to the optimistically selected peer
+							peerManager.sendUnchokeMessage();
+						} catch (IOException e1) {
+
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+
+						// if previousOptimisticallyUnchokedPeer
+						if (previousOptUnchokedPeer != null) {
+
+							// set the value of the previous optimistically unchoked peer to false
+							previousOptUnchokedPeer.optimisticallyUnchokedPeer = false;
+
+							// if previous optimisticallyUnchokedPeer has been choked already
+							if (previousOptUnchokedPeer.isChoked()) {
+
+								try {
+
+									System.out.println("Send choke message from the previous Optimistic neighbour");
+
+									// send choke message from it to the owner peer
+									previousOptUnchokedPeer.sendChokeMessage();
+
+								} catch (IOException e) {
+
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+
+							}
+						}
+
+						// reassign the previousOptimisticallyUnchokedPeer value to the current selected peer
+						previousOptUnchokedPeer = peerManager;
+
+						System.out.println( peerManager.getPeerId() + " has been selected as optimistic unchoked neighbour for peer "+ PeerManager.ownerId);
+						pp.logging(peerManager.getPeerId() + " has been selected as optimistic unchoked neighbour for peer "+ PeerManager.ownerId);
+
+					}
+				}
+			}
 		}
 	}
 
@@ -331,7 +307,7 @@ public class PeerSchedules {
 
 			// Obtain the bitField of owner peer
 			byte[] ownerBitField = PeerManager.getOwnerBitField();
-			System.out.println("Arrays.toString(myBitField) = " + Arrays.toString(ownerBitField));
+			System.out.println("Bit fields of owner peer: " + Arrays.toString(ownerBitField));
 
 			// if peersList size of owner peer equals the total number of peers in peerInfo config file
 			if (peerProcess.listOfPeers.size() == CommonPeerConfig.retrievePeerInfo().size()) {
@@ -357,24 +333,30 @@ public class PeerSchedules {
 				// if all the peers in the owner peersList have same bitField message as the owner
 				if (shutDownFlag) {
 
+					Iterator<PeerThread> iter = peerProcess.listOfPeers.iterator();
+
 					// for every peerThread in the peersList
-					for (PeerThread pt : peerProcess.listOfPeers) {
+					while(iter.hasNext()) {
+
+						PeerThread pt = iter.next();
 
 						// set the Peerthread toStop to true
 						pt.toStop = true;
+
 						try {
+
 							// before exiting check if peerSocket is already closed, if no close it
 							if(pt.peerSocket.isClosed());
 							else
 								pt.peerSocket.close();
+
 						} catch (IOException e) {
-							System.out.println("Could not close socket:");
 							e.printStackTrace();
 						}
 
 					}
 
-					//lets write it to a file
+					// Start cancelling the scheduled tasks
 					System.out.println("Shut down the scheduled timer tasks..");
 
 					// Terminate the timers, discarding any currently scheduled tasks.
@@ -390,11 +372,8 @@ public class PeerSchedules {
 
 				}
 			}
-
 		}
-	};
-
-
+	}
 }
 
 
