@@ -8,7 +8,7 @@ import java.util.logging.Logger;
 public class peerProcess {
 
 	// Declare the logger
-	private static final Logger LOGGER = MyLogger.getMyLogger();
+	private static final Logger LOGGER = MyLogger.loggerInstance();
 
 	// Synchronized list to maintain all the connected peers of owner peer
 	public static List<PeerThread> listOfPeers = Collections.synchronizedList(new ArrayList<PeerThread>());
@@ -19,7 +19,6 @@ public class peerProcess {
 	// List to maintain interested and choked peers
 	List<PeerManager> listOfchokedPeers = null;
 
-	
 	public static void main(String[] args) {
 
 		// Obtain peerId from command line and set it as owner and put it in the commonConfig hashmap
@@ -143,7 +142,7 @@ public class peerProcess {
 		Logger logger = LOGGER;
 		if (logger != null){}
 		else
-			logger = MyLogger.getMyLogger();
+			logger = MyLogger.loggerInstance();
 		logger.info(logMessage);
 	}
 

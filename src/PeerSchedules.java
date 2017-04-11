@@ -194,99 +194,96 @@ public class PeerSchedules {
 
 			int chokeListSize = 0;
 
-			if(pp.listOfchokedPeers != null) {
+			// if choke list is empty
+			if ((chokeListSize = pp.listOfchokedPeers.size()) == 0) {
 
-				// if choke list is empty
-				if ((chokeListSize = pp.listOfchokedPeers.size()) == 0) {
+				// if previousOptimisticallyUnchokedPeer is not null
+				if (previousOptUnchokedPeer != null) {
 
-					// if previousOptimisticallyUnchokedPeer is not null
-					if (previousOptUnchokedPeer != null) {
+					// set the value of the previous optimistically Unchoked peer to false
+					previousOptUnchokedPeer.optimisticallyUnchokedPeer = false;
 
-						// set the value of the previous optimistically Unchoked peer to false
-						previousOptUnchokedPeer.optimisticallyUnchokedPeer = false;
+					// if previous optimistically unchoked peer has been choked
+					if (previousOptUnchokedPeer.isChoked()) {
 
-						// if previous optimistically unchoked peer has been choked
-						if (previousOptUnchokedPeer.isChoked()) {
+						System.out.println("Send choke message from optimistically unchoked neighbour.");
 
-							System.out.println("Send choke message from optimistically unchoked neighbour.");
+						try {
 
-							try {
+							// send choked message from it to the owner peer
+							previousOptUnchokedPeer.sendChokeMessage();
+						} catch (IOException e) {
 
-								// send choked message from it to the owner peer
-								previousOptUnchokedPeer.sendChokeMessage();
-							} catch (IOException e) {
-
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
+							// TODO Auto-generated catch block
+							e.printStackTrace();
 						}
 					}
-					// set the previous Optimistically unchoked peer to null
-					previousOptUnchokedPeer = null;
-
-
 				}
+				// set the previous Optimistically unchoked peer to null
+				previousOptUnchokedPeer = null;
 
-				// if owner peer chokeList is non null
-				else {
 
-					System.out.println("Size of list of choked peers is :" + chokeListSize);
+			}
 
-					// Randomly select a peer from the choked peers list of currently executing owner peer thread   
-					PeerManager peerManager = pp.listOfchokedPeers.remove(ThreadLocalRandom.current().nextInt(0, chokeListSize));
+			// if owner peer chokeList is non null
+			else {
 
-					System.out.println("Randomly selected optimistic peer: "+ peerManager.getPeerId());
+				System.out.println("Size of list of choked peers is :" + chokeListSize);
 
-					// if a peer is obtained by random selection 
-					if (peerManager != null) {
+				// Randomly select a peer from the choked peers list of currently executing owner peer thread   
+				PeerManager peerManager = pp.listOfchokedPeers.remove(ThreadLocalRandom.current().nextInt(0, chokeListSize));
 
-						// if it has not been selected previously
-						if (peerManager != previousOptUnchokedPeer) {
+				System.out.println("Randomly selected optimistic peer: "+ peerManager.getPeerId());
 
-							// Set the value of optimistically unchoked peer as true for the peer
-							peerManager.optimisticallyUnchokedPeer = true;
+				// if a peer is obtained by random selection 
+				if (peerManager != null) {
 
-							try {
-								// send an unchoke message to the optimistically selected peer
-								peerManager.sendUnchokeMessage();
-							} catch (IOException e1) {
+					// if it has not been selected previously
+					if (peerManager != previousOptUnchokedPeer) {
 
-								// TODO Auto-generated catch block
-								e1.printStackTrace();
-							}
+						// Set the value of optimistically unchoked peer as true for the peer
+						peerManager.optimisticallyUnchokedPeer = true;
 
-							// if previousOptimisticallyUnchokedPeer
-							if (previousOptUnchokedPeer != null) {
+						try {
+							// send an unchoke message to the optimistically selected peer
+							peerManager.sendUnchokeMessage();
+						} catch (IOException e1) {
 
-								// set the value of the previous optimistically unchoked peer to false
-								previousOptUnchokedPeer.optimisticallyUnchokedPeer = false;
-
-								// if previous optimisticallyUnchokedPeer has been choked already
-								if (previousOptUnchokedPeer.isChoked()) {
-
-									try {
-
-										System.out.println("Send choke message from the previous Optimistic neighbour");
-
-										// send choke message from it to the owner peer
-										previousOptUnchokedPeer.sendChokeMessage();
-
-									} catch (IOException e) {
-
-										// TODO Auto-generated catch block
-										e.printStackTrace();
-									}
-
-								}
-							}
-
-							// reassign the previousOptimisticallyUnchokedPeer value to the current selected peer
-							previousOptUnchokedPeer = peerManager;
-
-							System.out.println( peerManager.getPeerId() + " has been selected as optimistic unchoked neighbour for peer "+ PeerManager.ownerId);
-							pp.logging(peerManager.getPeerId() + " has been selected as optimistic unchoked neighbour for peer "+ PeerManager.ownerId);
-
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
 						}
+
+						// if previousOptimisticallyUnchokedPeer
+						if (previousOptUnchokedPeer != null) {
+
+							// set the value of the previous optimistically unchoked peer to false
+							previousOptUnchokedPeer.optimisticallyUnchokedPeer = false;
+
+							// if previous optimisticallyUnchokedPeer has been choked already
+							if (previousOptUnchokedPeer.isChoked()) {
+
+								try {
+
+									System.out.println("Send choke message from the previous Optimistic neighbour");
+
+									// send choke message from it to the owner peer
+									previousOptUnchokedPeer.sendChokeMessage();
+
+								} catch (IOException e) {
+
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+
+							}
+						}
+
+						// reassign the previousOptimisticallyUnchokedPeer value to the current selected peer
+						previousOptUnchokedPeer = peerManager;
+
+						System.out.println( peerManager.getPeerId() + " has been selected as optimistic unchoked neighbour for peer "+ PeerManager.ownerId);
+						pp.logging(peerManager.getPeerId() + " has been selected as optimistic unchoked neighbour for peer "+ PeerManager.ownerId);
+
 					}
 				}
 			}

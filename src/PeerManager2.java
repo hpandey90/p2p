@@ -7,7 +7,7 @@ import java.util.logging.Logger;
 /*
  * Class to encapsulate the Peer managing functionality.
  */
-public class PeerManager {
+public class PeerManager2 {
 
 
 	// static structures and declarations
@@ -357,8 +357,8 @@ public class PeerManager {
 
 	}
 
-	// PeerManager constructor.
-	public PeerManager(Socket psocket) {
+	// PeerManager2 constructor.
+	public PeerManager2(Socket psocket) {
 
 		this.socket = psocket;
 		// -- see this
@@ -393,7 +393,7 @@ public class PeerManager {
 			// Send the handshake to the peer.
 			synchronized (handshakeSucess) {
 
-				// Create the handshake message by concatenating the handshake header, zero bits and the owner peerId 
+				/*// Create the handshake message by concatenating the handshake header, zero bits and the owner peerId 
 				// (retrieved from the commonConfig hashmap written in peerProcess).
 				byte[] concatenateByteArrays = ByteArrayManipulation.mergeByteArrays(ByteArrayManipulation.mergeByteArrays(HANDSHAKE_HEADER, ZERO_BITS),
 						String.valueOf(PeerManager.ownerId).getBytes());
@@ -411,6 +411,19 @@ public class PeerManager {
 					LOGGER.severe("Handshake sending failed." + e.getMessage());
 				}
 
+			}*/
+				
+				
+				byte[] concatenateByteArrays = ByteArrayManipulation.mergeByteArrays(ByteArrayManipulation.mergeByteArrays(HANDSHAKE_HEADER, ZERO_BITS),
+						String.valueOf(PeerManager.ownerId).getBytes());
+				String message = new String();
+				try {
+				
+				ObjectOutputStream oos = new ObjectOutputStream(output);  			  
+				oos.writeObject(this);
+				} catch (IOException e) {
+					LOGGER.severe("Handshake sending failed." + e.getMessage());
+				}
 			}
 	}
 
@@ -509,8 +522,10 @@ public class PeerManager {
         return false;
 
 		/*int i = 0;
+
 		// Obtain the ownerBitField byte array
 		byte[] bitField = getOwnerBitField();
+
 		// byte array to store result of comparing owner peer and client peer bit field message values 
 		byte[] ouput = new byte[bitField.length];
 		
@@ -519,7 +534,9 @@ public class PeerManager {
 			ouput[i] = (byte) (byt ^ bitFieldMesssageOfPeer[i]);
 			i++;
 		}
+
 		i = 0;
+
 		// Compute bitwise AND between output and complement of ownerBitField to see if any bits exist in output which are not already in owner
 		// resulting in output holding bits in client which are not in owner.
 		// if resulting output is zero, implies client has no bits which are not already in owner.
@@ -529,6 +546,7 @@ public class PeerManager {
 				return true;
 			}
 		}
+
 		return false;*/
 
 	}
