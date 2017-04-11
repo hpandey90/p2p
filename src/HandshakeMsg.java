@@ -6,7 +6,7 @@ public class HandshakeMsg {
 	int peerId;
 	
 	
-	public HandshakeMsg (String header,String zeros, int id) {
+	public HandshakeMsg (int id) {
 		this.handshakeHeader = "P2PFILESHARINGPROJ";
 		this.zeroBits = "0000000000";
 		this.peerId = id;
