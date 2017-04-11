@@ -33,7 +33,7 @@ public class MyLogger {
 		}
 
 		messageLog.setLevel(Level.INFO);
-		String logDirName = "peer_" + CommonPeerConfig.retrieveCommonConfig().get("peerId");
+		String logDirName = "peer_" + PeerManager.ownerId;
         File newDir = new File(logDirName);
         if(!newDir.isDirectory()){
             newDir.mkdir(); //create directory if doesn't exist
