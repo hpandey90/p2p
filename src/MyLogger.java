@@ -5,47 +5,48 @@ import java.text.SimpleDateFormat;
 
 class LogFormatter extends Formatter {
 	@Override
-	public String format(LogRecord rc) {
+	public String format(LogRecord record) {
 		StringBuffer strBuffer = new StringBuffer(1000);
 		SimpleDateFormat date_format = new SimpleDateFormat("MMM dd,yyyy HH:mm:ss");
-		Date resultdate = new Date(rc.getMillis());
+		Date resultdate = new Date(record.getMillis());
 		strBuffer.append(date_format.format(resultdate));
 		strBuffer.append(" ");
-		strBuffer.append(rc.getMessage());
+		strBuffer.append(record.getMessage());
 		strBuffer.append("\n");
-		return strBuffer.toString();
+		String str = strBuffer.toString();
+		return str;
 	}
 }
 
 public class MyLogger {
-	static private FileHandler logFileHandler;
-	static private LogFormatter logTextHandler;
-	private static Logger logger;
+	private static  FileHandler logFileHandler;
+	private static  LogFormatter logTextHandler;
+	private static  Logger messageLog;
 
 	static public void setup() throws IOException {
 
-		logger = Logger.getLogger(MyLogger.class.getName());
-		logger.setUseParentHandlers(false);
-		Handler[] handlers = logger.getHandlers();
-		if (handlers.length > 0 && handlers != null && handlers[0] instanceof ConsoleHandler) {
-			logger.removeHandler(handlers[0]);
+		messageLog = Logger.getLogger(MyLogger.class.getName());
+		messageLog.setUseParentHandlers(false); // prevent log from being sent to its parent
+		Handler[] messageHandle = messageLog.getHandlers();
+		if (messageHandle.length > 0 && messageHandle != null && messageHandle[0] instanceof ConsoleHandler) {
+			messageLog.removeHandler(messageHandle[0]);
 		}
 
-		logger.setLevel(Level.INFO);
+		messageLog.setLevel(Level.INFO);
 		String logDirName = "peer_" + CommonPeerConfig.retrieveCommonConfig().get("peerId");
-        File directory = new File(logDirName);
-        if(!directory.isDirectory()){
-            directory.mkdir();
+        File newDir = new File(logDirName);
+        if(!newDir.isDirectory()){
+            newDir.mkdir(); //create directory if doesn't exist
         }
         logTextHandler = new LogFormatter();
-        String logFileName =  directory.getPath() + File.separator + "log_peer_"+ CommonPeerConfig.retrieveCommonConfig().get("peerId") + ".log";
-        logFileHandler = new FileHandler(logFileName);
+        String logFileName =  newDir.getPath() + File.separator + "log_peer_"+ CommonPeerConfig.retrieveCommonConfig().get("peerId") + ".log";
+        logFileHandler = new FileHandler(logFileName); //create new log file
 		logFileHandler.setFormatter(logTextHandler);
-		logger.addHandler(logFileHandler);
+		messageLog.addHandler(logFileHandler);
 	}
 
-	public static Logger getMyLogger() {
-		return logger;
+	public static Logger loggerInstance() {
+		return messageLog;
 	}
 }
 
