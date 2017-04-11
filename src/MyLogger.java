@@ -5,13 +5,13 @@ import java.text.SimpleDateFormat;
 
 class LogFormatter extends Formatter {
 	@Override
-	public String format(LogRecord rc) {
+	public String format(LogRecord record) {
 		StringBuffer strBuffer = new StringBuffer(1000);
 		SimpleDateFormat date_format = new SimpleDateFormat("MMM dd,yyyy HH:mm:ss");
-		Date resultdate = new Date(rc.getMillis());
+		Date resultdate = new Date(record.getMillis());
 		strBuffer.append(date_format.format(resultdate));
 		strBuffer.append(" ");
-		strBuffer.append(rc.getMessage());
+		strBuffer.append(record.getMessage());
 		strBuffer.append("\n");
 		String str = strBuffer.toString();
 		return str;
