@@ -26,7 +26,7 @@ public class MyLogger {
 	static public void setup() throws IOException {
 
 		messageLog = Logger.getLogger(MyLogger.class.getName());
-		messageLog.setUseParentHandlers(false);
+		messageLog.setUseParentHandlers(false); // prevent log from being sent to its parent
 		Handler[] messageHandle = messageLog.getHandlers();
 		if (messageHandle.length > 0 && messageHandle != null && messageHandle[0] instanceof ConsoleHandler) {
 			messageLog.removeHandler(messageHandle[0]);
@@ -36,11 +36,11 @@ public class MyLogger {
 		String logDirName = "peer_" + CommonPeerConfig.retrieveCommonConfig().get("peerId");
         File newDir = new File(logDirName);
         if(!newDir.isDirectory()){
-            newDir.mkdir();
+            newDir.mkdir(); //create directory if doesn't exist
         }
         logTextHandler = new LogFormatter();
         String logFileName =  newDir.getPath() + File.separator + "log_peer_"+ CommonPeerConfig.retrieveCommonConfig().get("peerId") + ".log";
-        logFileHandler = new FileHandler(logFileName);
+        logFileHandler = new FileHandler(logFileName); //create new log file
 		logFileHandler.setFormatter(logTextHandler);
 		messageLog.addHandler(logFileHandler);
 	}
