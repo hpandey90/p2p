@@ -9,7 +9,8 @@ import java.util.logging.Logger;
 public class PeerThread implements Runnable {
    
     // Declare the logger
-    private static final Logger LOGGER = MyLogger.getMyLogger();
+    private static final Logger LOGGER = MyLogger.loggerInstance();
+
    
     // Declare the peerSocket
     public Socket peerSocket = null;
@@ -129,6 +130,7 @@ public class PeerThread implements Runnable {
                 } else {
                     LOGGER.info("Peer " + PeerManager.ownerId
                             + " initiated a connection to " + peerConnected.getPeerId());
+
                 }
                 
                 // after exchanging the bitfield and interested messages, set the peerInitialized 
@@ -142,36 +144,7 @@ public class PeerThread implements Runnable {
         initialSetupThread.start();
     }
     
-    public enum OriginalMessageTypes{
-        CHOKE((byte)0), 
-        UNCHOKE((byte)1), 
-        INTERESTED((byte)2), 
-        NOT_INTERESTED((byte)3), 
-        HAVE((byte)4), 
-        BITFIELD((byte)5), 
-        REQUEST((byte)6), 
-        PIECE((byte)7);
-        
-        byte messageValue = -1;
-        
-        private OriginalMessageTypes(byte b){
-            this.messageValue = b;
-        }
-    }
-   
 
-    public static OriginalMessageTypes getMsgType(byte[] msgStat) {
-
-        String s = Arrays.toString(msgStat);
-        
-        for (OriginalMessageTypes actMsgType : OriginalMessageTypes.values()) {
-        
-            if (actMsgType.messageValue == msgStat[4]) {
-                return actMsgType;
-            }
-        }
-        return null;
-    }
 
     
 
@@ -194,13 +167,13 @@ public class PeerThread implements Runnable {
                 
                 byte[] messageBytesOfPeer = new byte[5];
                 messageBytesOfPeer = ByteArrayManipulation.readBytes(inputStream, messageBytesOfPeer, 5);
-                OriginalMessageTypes msgType = getMsgType(messageBytesOfPeer);
+                PeerManager.MessageTypes msgType = PeerManager.getMsgType(messageBytesOfPeer);
                 
 
-                if (msgType == OriginalMessageTypes.BITFIELD){
+                if (msgType == PeerManager.MessageTypes.BITFIELD){
                     // ignore 
                 }
-                else if (msgType == OriginalMessageTypes.HAVE){
+                else if (msgType == PeerManager.MessageTypes.HAVE){
                     System.out.println("Have message has been received from peer: " + peerConnected.getPeerId());
                     
                     // read the 4 byte piece index field of peer's have message from its peerSocket's input stream
@@ -232,7 +205,7 @@ public class PeerThread implements Runnable {
                     LOGGER.info("Peer " + PeerManager.ownerId + " received the have message from " + peerConnected.getPeerId());
             
                 }
-                else if (msgType == OriginalMessageTypes.CHOKE){
+                else if (msgType == PeerManager.MessageTypes.CHOKE){
                     System.out.println("Choke message has been received from peer: " + peerConnected.getPeerId());
                     
                     // Obtain the index of requested piece
@@ -256,7 +229,7 @@ public class PeerThread implements Runnable {
                     
                     LOGGER.info("Peer " + PeerManager.ownerId + " is choked by "+ peerConnected.getPeerId());
                 }
-                else if (msgType == OriginalMessageTypes.INTERESTED){
+                else if (msgType == PeerManager.MessageTypes.INTERESTED){
                     System.out.println("Interested message has been received from peer:" + peerConnected.getPeerId());
                     
                     // flag to check if the peer is an interested peer
@@ -279,7 +252,7 @@ public class PeerThread implements Runnable {
                     
                     LOGGER.info("Peer " + PeerManager.ownerId + " received the interested message from " + peerConnected.getPeerId());
                 }
-                else if (msgType == OriginalMessageTypes.NOT_INTERESTED){
+                else if (msgType == PeerManager.MessageTypes.NOT_INTERESTED){
 
                     System.out.println("Not interested message has been received from peer:"  + peerConnected.getPeerId());
                     
@@ -295,7 +268,7 @@ public class PeerThread implements Runnable {
                     LOGGER.info("Peer " + PeerManager.ownerId + " received the not interested message from " + peerConnected.getPeerId());
                     
                 }
-                else if (msgType == OriginalMessageTypes.PIECE){
+                else if (msgType == PeerManager.MessageTypes.PIECE){
                     System.out.println("Piece message has been received from peer:"  + peerConnected.getPeerId());
                     
                     // byte array to hold piece message bytes of peer
@@ -388,7 +361,7 @@ public class PeerThread implements Runnable {
                         }
                     }
                 }
-                else if (msgType == OriginalMessageTypes.REQUEST){
+                else if (msgType == PeerManager.MessageTypes.REQUEST){
                     System.out.println("Request message has been received from peer:" +  peerConnected.getPeerId());
                     
                     // read the 4 byte piece index field from request message of client peer
@@ -405,7 +378,7 @@ public class PeerThread implements Runnable {
                         peerConnected.sendPieceMessage(pieceIndex);
                     }
                 }
-                else if (msgType == OriginalMessageTypes.UNCHOKE){
+                else if (msgType == PeerManager.MessageTypes.UNCHOKE){
                     System.out.println("Unchoke message has been received from peer:" +   peerConnected.getPeerId());
                     
                     // add peer to the unchokedPeers hashmap of owner peer

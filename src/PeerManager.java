@@ -4,6 +4,8 @@ import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Logger;
 
+
+
 /*
  * Class to encapsulate the Peer managing functionality.
  */
@@ -31,6 +33,18 @@ public class PeerManager {
 		}
 	}
 
+    public static MessageTypes getMsgType(byte[] msgStat) {
+
+        String s = Arrays.toString(msgStat);
+        
+        for (MessageTypes actMsgType : MessageTypes.values()) {
+        
+            if (actMsgType.messageValue == msgStat[4]) {
+                return actMsgType;
+            }
+        }
+        return null;
+    }
 	public static byte[] getHandShakeMessage(int toPeerId) throws IOException {
 		return ByteArrayManipulation.mergeByteArrays(ByteArrayManipulation.mergeByteArrays(
 				HANDSHAKE_HEADER, ZERO_BITS), ByteArrayManipulation.intToByteArray(toPeerId));
