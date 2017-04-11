@@ -29,9 +29,9 @@ public class PeerSchedules {
 
 		this.pp = pp;
 
-		// Retrieve the common peer configuration values for scheduling tasks from common config file
 		Map<String, String> comProp = CommonPeerConfig.retrieveCommonConfig();
-		
+
+		// Retrieve the common peer configuration values for scheduling tasks from common config file
 		int m = Integer.parseInt(comProp.get("OptimisticUnchokingInterval"));
 		int k = Integer.parseInt(comProp.get("NumberOfPreferredNeighbors"));
 		int p = Integer.parseInt(comProp.get("UnchokingInterval"));
@@ -87,8 +87,7 @@ public class PeerSchedules {
 					// Instantiate unchoke and choke peers synchronized lists
 					pp.listOfUnchokedPeers = Collections.synchronizedList(new ArrayList<PeerManager>());
 					pp.listOfchokedPeers = Collections.synchronizedList(new ArrayList<PeerManager>());
-					
-					// Declare variable for keeping track of selected neighbours
+
 					int neighbours = 0;
 
 					// Iterator through the interestedList of peers for owner peer
@@ -194,7 +193,7 @@ public class PeerSchedules {
 			System.out.println("Entered selection of Optimistically Unchoked neighbours.");
 
 			int chokeListSize = 0;
-
+			if( pp.listOfchokedPeers!= null){
 			// if choke list is empty
 			if ((chokeListSize = pp.listOfchokedPeers.size()) == 0) {
 
@@ -288,6 +287,7 @@ public class PeerSchedules {
 					}
 				}
 			}
+			}
 		}
 	}
 
@@ -376,3 +376,4 @@ public class PeerSchedules {
 		}
 	}
 }
+

@@ -10,6 +10,7 @@ public class PeerThread implements Runnable {
    
     // Declare the logger
     private static final Logger LOGGER = MyLogger.loggerInstance();
+
    
     // Declare the peerSocket
     public Socket peerSocket = null;
@@ -140,7 +141,7 @@ public class PeerThread implements Runnable {
         initialSetupThread.start();
     }
     
-    
+
     
 
     @Override

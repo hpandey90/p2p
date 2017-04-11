@@ -1,4 +1,3 @@
-
 public class HandshakeMsg {
 
 	String handshakeHeader;
