@@ -54,26 +54,23 @@ public class PeerThread implements Runnable {
             // Send handshake message from the owner peer (retrieved from the commonConfig file written in peerProcess)
             // to the client peer. 
             peerConnected.sndHandshakeMessage();
-            System.out.println("*******sent hand shake in client:"+ PeerManager.ownerId + " "+peerConnected.getPeerId());
+            
             // Receive the handshake message from the peer to whom a handshake was previously sent
             // (using peer's socket inputbufferedstream).
             peerConnected.rcvHandshakeMessage();
-            System.out.println("******received hand shake in client: "+ PeerManager.ownerId + " "+peerConnected.getPeerId());
         
         } 
         // if a server owner peer
-else {
+        else {
             
             // if server owner peerThread, receive the handshake message from a client peer 
             int peerId = peerConnected.rcvHandshakeMessage();
-            System.out.println("***received hand shake in server: "+ PeerManager.ownerId + " "+peerConnected.getPeerId());
             
             // set the peerId of peerManager object to the client's peerId from whom the handshake was received
             peerConnected.setPeerId(peerId);
             
             // send handshake message to client peer
             peerConnected.sndHandshakeMessage();
-            System.out.println("*******send hand shake in server: "+ peerConnected.getPeerId() + " "+ PeerManager.ownerId);
 
         }
         
@@ -86,17 +83,14 @@ else {
         initialSetupThread = new Thread() {
             
             @Override
-            public void run() {
+			public void run() {
                 System.out.println("Peer connected is initialized " + peerConnected.getIsPeerInitialized());
                 
                 // send bitfield message from one peer to other
                 peerConnected.sndBitFieldMessageToPeer();
-                System.out.println("*****sent bit field: "+ peerConnected.getPeerId() + " "+ PeerManager.ownerId);
-
                 
                 // read the bitfield message of peer from its input peerSocket and save in a byte array 
                 peerConnected.readBitFieldMessageOfPeer();
-                System.out.println("********read bit fiel: "+ peerConnected.getPeerId() + " "+ PeerManager.ownerId);
 
                 // check if owner has missing bit field present in client's bit field message, if yes -> interested
                 if (peerConnected.isInterested()) {

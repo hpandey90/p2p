@@ -82,7 +82,7 @@ public class PeerSchedules {
 				// if interested list is non empty, select k peers which have the highest download rate
 				if (listOfInterestedPeers != null) {
 
-					System.out.println(PeerManager.ownerId+"==="+"The size of list of interestedPeers is: " + listOfInterestedPeers.size());
+					System.out.println("The size of list of interestedPeers is: " + listOfInterestedPeers.size());
 
 					// Instantiate unchoke and choke peers synchronized lists
 					pp.listOfUnchokedPeers = Collections.synchronizedList(new ArrayList<PeerManager>());
