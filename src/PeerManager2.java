@@ -7,7 +7,7 @@ import java.util.logging.Logger;
 /*
  * Class to encapsulate the Peer managing functionality.
  */
-public class PeerManager {
+public class PeerManager2 {
 
 
 	// static structures and declarations
@@ -357,8 +357,8 @@ public class PeerManager {
 
 	}
 
-	// PeerManager constructor.
-	public PeerManager(Socket psocket) {
+	// PeerManager2 constructor.
+	public PeerManager2(Socket psocket) {
 
 		this.socket = psocket;
 		// -- see this
@@ -393,7 +393,7 @@ public class PeerManager {
 			// Send the handshake to the peer.
 			synchronized (handshakeSucess) {
 
-				// Create the handshake message by concatenating the handshake header, zero bits and the owner peerId 
+				/*// Create the handshake message by concatenating the handshake header, zero bits and the owner peerId 
 				// (retrieved from the commonConfig hashmap written in peerProcess).
 				byte[] concatenateByteArrays = ByteArrayManipulation.mergeByteArrays(ByteArrayManipulation.mergeByteArrays(HANDSHAKE_HEADER, ZERO_BITS),
 						String.valueOf(PeerManager.ownerId).getBytes());
@@ -411,6 +411,19 @@ public class PeerManager {
 					LOGGER.severe("Handshake sending failed." + e.getMessage());
 				}
 
+			}*/
+				
+				
+				byte[] concatenateByteArrays = ByteArrayManipulation.mergeByteArrays(ByteArrayManipulation.mergeByteArrays(HANDSHAKE_HEADER, ZERO_BITS),
+						String.valueOf(PeerManager.ownerId).getBytes());
+				String message = new String();
+				try {
+				
+				ObjectOutputStream oos = new ObjectOutputStream(output);  			  
+				oos.writeObject(this);
+				} catch (IOException e) {
+					LOGGER.severe("Handshake sending failed." + e.getMessage());
+				}
 			}
 	}
 
