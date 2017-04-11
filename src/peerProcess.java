@@ -7,143 +7,152 @@ import java.util.logging.Logger;
 
 public class peerProcess {
 
-	// Declare the logger
-	private static final Logger LOGGER = MyLogger.loggerInstance();
+    // Declare the logger
+    private static final Logger LOGGER = MyLogger.loggerInstance();
 
-	// Synchronized list to maintain all the connected peers of owner peer
-	public static List<PeerThread> listOfPeers = Collections.synchronizedList(new ArrayList<PeerThread>());
+    // Synchronized list to maintain all the connected peers of owner peer
+    public static List<PeerThread> listOfPeers = Collections.synchronizedList(new ArrayList<PeerThread>());
 
-	// List to maintain interested and unchoked peers
-	List<PeerManager> listOfUnchokedPeers = null;
+    // List to maintain interested and unchoked peers
+    List<PeerManager> listOfUnchokedPeers = null;
 
-	// List to maintain interested and choked peers
-	List<PeerManager> listOfchokedPeers = null;
+    // List to maintain interested and choked peers
+    List<PeerManager> listOfchokedPeers = null;
 
-	public static void main(String[] args) {
+    public static void main(String[] args) {
 
-		// Obtain peerId from command line and set it as owner and put it in the commonConfig hashmap
-		// consisting of property, value pairs used later in the peerManager
-		Scanner scan = new Scanner(System.in);
-		int peerId = Integer.valueOf(args[0]);
+        // Obtain peerId from command line and set it as owner and put it in the commonConfig hashmap
+        // consisting of property, value pairs used later in the peerManager
+        Scanner scan = new Scanner(System.in);
+        int peerId = Integer.valueOf(args[0]);
 
-		// set the ownerId of PeerManager
-		PeerManager.ownerId = peerId;
+        // set the ownerId of PeerManager
+        PeerManager.ownerId = peerId;
 
-		//CommonPeerConfig.retrieveCommonConfig().put("peerId", String.valueOf(peerId));
-		scan.close();
+        //CommonPeerConfig.retrieveCommonConfig().put("peerId", String.valueOf(peerId));
+        scan.close();
 
-		// Initialize custom logger
-		try {
-			MyLogger.setup();
-		} catch (IOException e) {
-			e.printStackTrace();
-			throw new RuntimeException("Problems with creating the log files");
-		}
+        // Initialize custom logger
+        try {
+            MyLogger.setup();
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Problems with creating the log files");
+        }
 
-		// Create a peerProcess object to start client peers and owner server peer connection communication processes
-		peerProcess peerProcessOb = new peerProcess();
+        // Create a peerProcess object to start client peers and owner server peer connection communication processes
+        peerProcess peerProcessOb = new peerProcess();
 
-		// setup and start the client and server peer connections
-		peerProcessOb.peerConnectionSetup(peerId);
+        // setup and start the client and server peer connections
+        System.out.println("Before peerConnectionSetup "+peerId);
+        peerProcessOb.peerConnectionSetup(peerId);
 
-		// schedule the tasks for determining k preferred neighbours and optimistically unchoked neighbour peers
-		PeerSchedules st = new PeerSchedules(new peerProcess());
-	}
+        // schedule the tasks for determining k preferred neighbours and optimistically unchoked neighbour peers
+        PeerSchedules st = new PeerSchedules(new peerProcess());
+    }
 
-	/*
-	 * Start client peer threads and server peer threads to accept each client connection in a seperate thread
-	 */
-	public void peerConnectionSetup(int ownerPeerId) {
+    /*
+     * Start client peer threads and server peer threads to accept each client connection in a seperate thread
+     */
+    public void peerConnectionSetup(int ownerPeerId) {
 
-		// Obtain the peerInfo hashMap
-		Map<Integer, String> peerInfo = CommonPeerConfig.retrievePeerInfo();
+        // Obtain the peerInfo hashMap
+        Map<Integer, String> peerInfo = CommonPeerConfig.retrievePeerInfo();
 
-		for (Map.Entry<Integer, String> s : peerInfo.entrySet()) {
+        for (Map.Entry<Integer, String> s : peerInfo.entrySet()) {
 
-			// for every peer, obtain the peerId, host and listening port from the peerInfo map
-			String line = peerInfo.get(s.getKey());
-			String[] arr = line.split(" ");
-			int peerId = Integer.parseInt(arr[0]);
-			String host = arr[1];
-			int portN = Integer.parseInt(arr[2]);
+            // for every peer, obtain the peerId, host and listening port from the peerInfo map
+            String line = peerInfo.get(s.getKey());
+            String[] arr = line.split(" ");
+            int peerId = Integer.parseInt(arr[0]);
+            String host = arr[1];
+            int portN = Integer.parseInt(arr[2]);
+            System.out.println(peerId+"before peerId == ownerPeerId"+ownerPeerId);
+            // when the server owner peer found
+            if ( peerId == ownerPeerId) {
 
-			// when the server owner peer found
-			if ( peerId == ownerPeerId) {
+                Thread serverThread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
 
-				Thread serverThread = new Thread(new Runnable() {
-					@Override
-					public void run() {
+                        try {
 
-						try {
+                            int peerIdGreaterCount = 0;
 
-							int peerIdGreaterCount = 0;
+                            // Count peers having id > owner peer id
+                            for (Map.Entry<Integer, String> e : peerInfo.entrySet()) {
+                                if (e.getKey() < ownerPeerId) {
+                                    peerIdGreaterCount++;
+                                }
+                            }
+                            System.out.println(" before while peerIdGreaterCount>0"+portN+" "+host+" "+peerId + " "+ peerIdGreaterCount);
+                            //peerIdGreaterCount= 10;
+                            while (peerIdGreaterCount > 0) {
 
-							// Count peers having id > owner peer id
-							for (Map.Entry<Integer, String> e : peerInfo.entrySet()) {
-								if (e.getKey() > ownerPeerId) {
-									peerIdGreaterCount++;
-								}
-							}
+                        
 
-							while (peerIdGreaterCount > 0) {
+                                // Creating a server socket for the peer in which this program is running.
+                                System.out.println(" inside while peerIdGreaterCount>0"+portN+" "+host+" "+peerId + " "+ peerIdGreaterCount);
+                                ServerSocket serverSocket = new ServerSocket(portN);
+                                System.out.println("after server socket creation"+portN+" "+host+" "+peerId);
+                                Socket acceptedSocket = serverSocket.accept();
+                                System.out.println("After server accepted client: "+portN+" "+host+" "+peerId);
+                                PeerThread r = new PeerThread(acceptedSocket, false, -1);
+                                Thread listenThread = new Thread(r);                        
+                                listenThread.start();
+                                listOfPeers.add(r);
 
-								// Creating a server socket for the peer in which this program is running.
-								ServerSocket serverSocket = new ServerSocket(portN);
-								Socket acceptedSocket = serverSocket.accept();
-								PeerThread r = new PeerThread(acceptedSocket, false, -1);
-								Thread listenThread = new Thread(r);						
-								listenThread.start();
-								listOfPeers.add(r);
+                                // Decrement the greaterPeerCount
+                                peerIdGreaterCount--;
+                            }
 
-								// Decrement the greaterPeerCount
-								peerIdGreaterCount--;
-							}
+                        } catch (IOException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                    }
+                });
 
-						} catch (IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-					}
-				});
+                // Change the name of the serverThread for accepting client peer connections
+                serverThread.setName("Connection Accepting Thread ");
 
-				// Change the name of the serverThread for accepting client peer connections
-				serverThread.setName("Connection Accepting Thread ");
+                // start the serverThread
+                serverThread.start();
+            }
 
-				// start the serverThread
-				serverThread.start();
-			}
+            else {
+                System.out.println("is peerId < ownerPeerId" + (peerId < ownerPeerId));
+                if (peerId < ownerPeerId) { 
+                    //System.out.println("before else++++++++++++++++++++++++++");
 
-			else {
-				if (peerId < ownerPeerId) { 
+                    Socket clientSocket;
+                    try {
 
-					Socket clientSocket;
-					try {
+                        clientSocket = new Socket( host, portN);
+                        PeerThread r = new PeerThread(clientSocket, true, peerId);
+                        Thread clientThread = new Thread(r);
+                        clientThread.start();
+                        listOfPeers.add(r);
 
-						clientSocket = new Socket( host, portN);
-						PeerThread r = new PeerThread(clientSocket, true, peerId);
-						Thread clientThread = new Thread(r);
-						clientThread.start();
-						listOfPeers.add(r);
+                    } catch (UnknownHostException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }catch (IOException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
 
-					} catch (UnknownHostException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+                }
+            }
+        }       
+    }
 
-				}
-			}
-		}		
-	}
-
-	public void logging(String logMessage) {
-		Logger logger = LOGGER;
-		if (logger != null){}
-		else
-			logger = MyLogger.loggerInstance();
-		logger.info(logMessage);
-	}
+    public void logging(String logMessage) {
+        Logger logger = LOGGER;
+        if (logger != null){}
+        else
+            logger = MyLogger.loggerInstance();
+        logger.info(logMessage);
+    }
 
 }
