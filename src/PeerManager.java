@@ -99,6 +99,19 @@ public class PeerManager {
 		System.out.println("returning in readoriginal");
 		return data;
 	}
+	
+	public static OriginalMessageTypes getMsgType(byte[] msgStat) {
+
+		String s = Arrays.toString(msgStat);
+
+		for (OriginalMessageTypes actMsgType : OriginalMessageTypes.values()) {
+
+			if (actMsgType.messageValue == msgStat[4]) {
+				return actMsgType;
+			}
+		}
+		return null;
+	}
 
 	// Initialize optimisticallyUnchokedPeer with false. 
 	public boolean optimisticallyUnchokedPeer = false;
@@ -355,6 +368,7 @@ public class PeerManager {
 			}
 		}
 
+		System.out.println("printing ownerBitField:" + Arrays.toString(ownerBitField));
 	}
 
 	// PeerManager constructor.
@@ -396,7 +410,7 @@ public class PeerManager {
 				// Create the handshake message by concatenating the handshake header, zero bits and the owner peerId 
 				// (retrieved from the commonConfig hashmap written in peerProcess).
 				byte[] concatenateByteArrays = ByteArrayManipulation.mergeByteArrays(ByteArrayManipulation.mergeByteArrays(HANDSHAKE_BYTE_ARR, ZERO_BITS),
-						CommonPeerConfig.retrieveCommonConfig().get("peerId").getBytes());
+						String.valueOf(PeerManager.ownerId).getBytes());
 
 				try {
 
